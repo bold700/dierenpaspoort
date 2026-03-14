@@ -1,0 +1,185 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---- NES-first globals (geen DaisyUI) ---- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  font-family: "Press Start 2P", cursive, monospace;
+  min-height: 100vh;
+  background-color: #212529;
+  color: #e0e0e0;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Safe area voor notches / PWA;zelfde achtergrond als NES is-dark containers */
+.app-shell {
+  min-height: 100vh;
+  background-color: #212529;
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  padding-bottom: max(2rem, env(safe-area-inset-bottom));
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.app-shell::-webkit-scrollbar {
+  display: none;
+}
+
+/* Toast: NES-stijl, onderaan gecentreerd */
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: 2rem;
+  transform: translate(-50%, 100px);
+  opacity: 0;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  z-index: 1000;
+  pointer-events: none;
+}
+#toast.show {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+
+/* Kleine animatie voor resultaat-kaart */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fadeUp 0.3s ease-out;
+}
+
+/* Geen wit: lichte NES-containers en inputs → donkergrijs */
+.nes-container:not(.is-dark) {
+  background-color: #363b42;
+  color: #e0e0e0;
+}
+.nes-container:not(.is-dark).with-title > .title {
+  background-color: #363b42;
+}
+.nes-container:not(.is-dark) .nes-text.is-primary { color: #209cee; }
+.nes-container:not(.is-dark) .nes-text.is-disabled { color: #9ca3af; }
+.nes-input:not(.is-dark) {
+  background-color: #363b42;
+  color: #e0e0e0;
+  border-color: #212529;
+}
+.nes-input:not(.is-dark)::placeholder {
+  color: #6b7280;
+}
+/* Progress bars: donkere track (#363b42) voor alle varianten, NES-kleuren voor vulling */
+.nes-progress {
+  background-color: #363b42;
+}
+.nes-progress::-webkit-progress-bar {
+  background-color: #363b42;
+}
+/* Default (geen modifier): donkere vulling */
+.nes-progress::-webkit-progress-value {
+  background-color: #212529;
+}
+.nes-progress::-moz-progress-bar {
+  background-color: #212529;
+}
+/* is-primary: blauw */
+.nes-progress.is-primary::-webkit-progress-bar,
+.nes-progress.is-success::-webkit-progress-bar,
+.nes-progress.is-warning::-webkit-progress-bar,
+.nes-progress.is-error::-webkit-progress-bar {
+  background-color: #363b42;
+}
+.nes-progress.is-primary::-webkit-progress-value {
+  background-color: #209cee;
+}
+.nes-progress.is-primary::-moz-progress-bar {
+  background-color: #209cee;
+}
+/* is-success: groen */
+.nes-progress.is-success::-webkit-progress-value {
+  background-color: #92cc41;
+}
+.nes-progress.is-success::-moz-progress-bar {
+  background-color: #92cc41;
+}
+/* is-warning: geel */
+.nes-progress.is-warning::-webkit-progress-value {
+  background-color: #f7d51d;
+}
+.nes-progress.is-warning::-moz-progress-bar {
+  background-color: #f7d51d;
+}
+/* is-error: rood */
+.nes-progress.is-error::-webkit-progress-value {
+  background-color: #e76e55;
+}
+.nes-progress.is-error::-moz-progress-bar {
+  background-color: #e76e55;
+}
+/* is-pattern: checkerboard – track ook donker */
+.nes-progress.is-pattern::-webkit-progress-bar {
+  background-color: #363b42;
+}
+
+/* Titels erven body-font (Press Start 2P) */
+.nes-container.with-title > .title {
+  font-family: inherit;
+}
+
+
+/* ---- NES Buttons: volg documentatie (Normal/Warning/Disabled = donkere tekst; Primary/Success/Error = witte tekst) ---- */
+/* Zorg dat knoppen in donkere app niet body-kleur erven: standaard = donker op licht */
+.nes-btn:not(.is-primary):not(.is-success):not(.is-warning):not(.is-error) {
+  color: #212529;
+}
+.nes-btn:not(.is-primary):not(.is-success):not(.is-warning):not(.is-error):hover,
+.nes-btn:not(.is-primary):not(.is-success):not(.is-warning):not(.is-error):focus {
+  color: #212529;
+}
+.nes-btn.is-primary,
+.nes-btn.is-primary:hover,
+.nes-btn.is-success,
+.nes-btn.is-success:hover,
+.nes-btn.is-error,
+.nes-btn.is-error:hover {
+  color: #fff;
+}
+.nes-btn.is-warning,
+.nes-btn.is-warning:hover {
+  color: #212529;
+}
+.nes-btn.is-disabled,
+.nes-btn.is-disabled:hover {
+  color: #212529;
+}
+
+/* Links als NES-knoppen:zelfde uiterlijk als <button class="nes-btn"> */
+a.nes-btn {
+  text-decoration: none;
+  display: inline-block;
+}
+a.nes-btn:hover,
+a.nes-btn:focus {
+  text-decoration: none;
+}

@@ -1,0 +1,79 @@
+import { create } from 'zustand'
+import type { AIProvider, TTSProvider } from '../types'
+import { VOICES } from '../constants'
+
+export interface SettingsState {
+  provider: AIProvider
+  apiKey: string
+  tts: TTSProvider
+  elKey: string
+  voiceId: string
+}
+
+const STORAGE_KEY = 'dp_settings'
+
+function load(): SettingsState {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return getDefault()
+    const parsed = JSON.parse(raw) as Partial<SettingsState>
+    return { ...getDefault(), ...parsed }
+  } catch {
+    return getDefault()
+  }
+}
+
+function getDefault(): SettingsState {
+  return {
+    provider: 'anthropic',
+    apiKey: '',
+    tts: 'browser',
+    elKey: '',
+    voiceId: VOICES[0].id
+  }
+}
+
+function save(s: SettingsState) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(s))
+  } catch (_) {}
+}
+
+export const useSettingsStore = create<SettingsState & {
+  setProvider: (p: AIProvider) => void
+  setApiKey: (k: string) => void
+  setTTS: (t: TTSProvider) => void
+  setElKey: (k: string) => void
+  setVoiceId: (id: string) => void
+  hasApiKey: () => boolean
+  hasElKey: () => boolean
+}>((set, get) => ({
+  ...load(),
+
+  setProvider(provider) {
+    set({ provider })
+    save({ ...get(), provider })
+  },
+  setApiKey(apiKey) {
+    set({ apiKey })
+    save({ ...get(), apiKey })
+  },
+  setTTS(tts) {
+    set({ tts })
+    save({ ...get(), tts })
+  },
+  setElKey(elKey) {
+    set({ elKey })
+    save({ ...get(), elKey })
+  },
+  setVoiceId(voiceId) {
+    set({ voiceId })
+    save({ ...get(), voiceId })
+  },
+  hasApiKey() {
+    return !!get().apiKey
+  },
+  hasElKey() {
+    return !!get().elKey
+  }
+}))

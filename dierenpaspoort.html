@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dierenpaspoort</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; }
+  .app { max-width: 420px; margin: 0 auto; padding: 0 0 2rem; min-height: 100vh; }
+  .header { background: linear-gradient(135deg, #1a5c2a 0%, #2d8a45 100%); color: white; padding: 1.25rem 1.25rem 1rem; border-radius: 0 0 16px 16px; margin-bottom: 1.25rem; }
+  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+  .logo { display: flex; align-items: center; gap: 8px; }
+  .logo-icon { width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .logo-text { font-size: 18px; font-weight: 500; }
+  .logo-sub { font-size: 11px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px; }
+  .settings-btn { background: rgba(255,255,255,0.15); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px; }
+  .xp-bar-wrap { background: rgba(255,255,255,0.15); border-radius: 100px; height: 6px; margin-top: 0.5rem; overflow: hidden; }
+  .xp-bar { height: 100%; border-radius: 100px; background: #a8ff78; transition: width 0.6s ease; }
+  .stats-row { display: flex; gap: 0.75rem; padding: 0 1rem; margin-bottom: 1rem; }
+  .stat-pill { flex: 1; background: white; border: 0.5px solid rgba(0,0,0,0.1); border-radius: 12px; padding: 0.6rem 0.75rem; text-align: center; }
+  .stat-pill .num { font-size: 22px; font-weight: 500; color: #1a1a1a; line-height: 1; }
+  .stat-pill .lbl { font-size: 11px; color: #888; margin-top: 2px; }
+  .tabs { display: flex; gap: 4px; padding: 0 1rem; margin-bottom: 1rem; }
+  .tab { flex: 1; padding: 0.5rem; border: 0.5px solid rgba(0,0,0,0.1); background: white; border-radius: 8px; font-size: 13px; color: #888; cursor: pointer; text-align: center; transition: all 0.15s; }
+  .tab.active { background: #1a5c2a; color: white; border-color: #1a5c2a; font-weight: 500; }
+  .panel { padding: 0 1rem; }
+  .scan-zone { border: 1.5px dashed rgba(0,0,0,0.2); border-radius: 16px; padding: 2rem 1.5rem; text-align: center; cursor: pointer; margin-bottom: 1rem; background: white; }
+  .scan-icon { width: 64px; height: 64px; background: #eaf5ec; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; margin: 0 auto 0.75rem; }
+  .scan-title { font-size: 15px; font-weight: 500; color: #1a1a1a; margin-bottom: 4px; }
+  .scan-sub { font-size: 13px; color: #888; margin-bottom: 1rem; }
+  .scan-btn { background: #1a5c2a; color: white; border: none; border-radius: 100px; padding: 0.6rem 1.5rem; font-size: 14px; font-weight: 500; cursor: pointer; }
+  #fileInput { display: none; }
+  .preview-img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 0.75rem; }
+  .loading-dots { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.5rem 0; color: #2d8a45; font-size: 14px; }
+  .dot { width: 7px; height: 7px; background: #2d8a45; border-radius: 50%; animation: bounce 1.2s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-6px);opacity:1} }
+  .result-card { background: white; border: 0.5px solid rgba(0,0,0,0.1); border-radius: 16px; overflow: hidden; margin-bottom: 1rem; display: none; }
+  .result-card.show { display: block; animation: fadeUp 0.4s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)} }
+  .result-hero { background: #1a5c2a; padding: 1.5rem 1.25rem 1.25rem; text-align: center; position: relative; }
+  .result-emoji { font-size: 72px; line-height: 1; margin-bottom: 8px; display: block; }
+  .result-name { font-size: 26px; font-weight: 500; color: white; margin-bottom: 6px; }
+  .rarity-badge { display: inline-block; font-size: 12px; padding: 4px 14px; border-radius: 100px; font-weight: 500; }
+  .rarity-gewoon { background: #eaf5ec; color: #27500a; }
+  .rarity-bijzonder { background: #e6f1fb; color: #0c447c; }
+  .rarity-zeldzaam { background: #faeeda; color: #633806; }
+  .rarity-superschaars { background: #fcebeb; color: #791f1f; }
+  .speak-btn { position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.2); border: none; color: white; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 18px; }
+  .result-section { padding: 1rem 1.25rem; border-bottom: 0.5px solid rgba(0,0,0,0.08); }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .stat-tile { background: #f5f5f0; border-radius: 12px; padding: 0.75rem 0.5rem; text-align: center; cursor: pointer; }
+  .stat-tile .ico { font-size: 26px; line-height: 1; margin-bottom: 4px; }
+  .stat-tile .val { font-size: 14px; font-weight: 500; color: #1a1a1a; }
+  .compare-tile { background: #f5f5f0; border-radius: 12px; padding: 0.75rem; display: flex; align-items: center; gap: 10px; cursor: pointer; margin-bottom: 6px; }
+  .compare-tile:last-child { margin-bottom: 0; }
+  .compare-tile .cico { font-size: 28px; flex-shrink: 0; }
+  .compare-tile .ctxt { font-size: 13px; font-weight: 500; color: #1a1a1a; line-height: 1.3; }
+  .weetje-tile { border-radius: 12px; padding: 0.75rem; display: flex; align-items: center; gap: 10px; margin-bottom: 6px; cursor: pointer; }
+  .weetje-tile:last-child { margin-bottom: 0; }
+  .weetje-tile.groen { background: #eaf5ec; }
+  .weetje-tile.blauw { background: #e6f1fb; }
+  .weetje-tile.oranje { background: #faeeda; }
+  .weetje-tile .wico { font-size: 28px; flex-shrink: 0; }
+  .weetje-tile.groen .wtxt { color: #1a5c2a; }
+  .weetje-tile.blauw .wtxt { color: #0c447c; }
+  .weetje-tile.oranje .wtxt { color: #633806; }
+  .weetje-tile .wtxt { font-size: 13px; font-weight: 500; line-height: 1.4; }
+  .xp-bar-result { display: flex; align-items: center; justify-content: center; gap: 8px; background: #1a5c2a; color: white; padding: 0.75rem; font-size: 14px; font-weight: 500; }
+  .new-badge { background: #a8ff78; color: #1a5c2a; font-size: 11px; padding: 2px 8px; border-radius: 100px; font-weight: 500; }
+  .collection-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .animal-tile { background: white; border: 0.5px solid rgba(0,0,0,0.1); border-radius: 12px; padding: 0.75rem 0.5rem; text-align: center; cursor: pointer; position: relative; }
+  .animal-tile .emoji { font-size: 28px; margin-bottom: 4px; }
+  .animal-tile .name { font-size: 11px; font-weight: 500; color: #1a1a1a; }
+  .animal-tile .count { font-size: 10px; color: #888; }
+  .rarity-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; }
+  .dot-gewoon{background:#2d8a45}.dot-bijzonder{background:#185fa5}.dot-zeldzaam{background:#ba7517}.dot-superschaars{background:#a32d2d}
+  .empty-state { text-align: center; padding: 2.5rem 1rem; color: #888; }
+  .empty-state .big { font-size: 48px; margin-bottom: 0.75rem; }
+  .empty-state p { font-size: 14px; line-height: 1.5; }
+  .section-title { font-size: 13px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem; }
+  .achievement { display: flex; align-items: center; gap: 12px; background: white; border: 0.5px solid rgba(0,0,0,0.1); border-radius: 12px; padding: 0.75rem; margin-bottom: 8px; }
+  .ach-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .ach-locked { background: #f5f5f0; filter: grayscale(1); opacity: 0.5; }
+  .ach-unlocked { background: #eaf5ec; }
+  .ach-name { font-size: 14px; font-weight: 500; color: #1a1a1a; }
+  .ach-desc { font-size: 12px; color: #888; }
+  .pb-wrap { height: 4px; background: #f5f5f0; border-radius: 100px; margin-top: 6px; overflow: hidden; }
+  .pb { height: 100%; background: #2d8a45; border-radius: 100px; }
+  .settings-card { background: white; border: 0.5px solid rgba(0,0,0,0.1); border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; }
+  .settings-label { font-size: 12px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+  .provider-toggle,.tts-toggle { display: flex; gap: 6px; margin-bottom: 1rem; }
+  .provider-btn,.tts-btn { flex: 1; padding: 0.6rem; border: 0.5px solid rgba(0,0,0,0.1); background: #f5f5f0; border-radius: 8px; font-size: 13px; cursor: pointer; text-align: center; color: #888; }
+  .provider-btn.active,.tts-btn.active { background: #1a5c2a; color: white; border-color: #1a5c2a; font-weight: 500; }
+  .key-input-wrap { position: relative; margin-bottom: 0.5rem; }
+  .key-input { width: 100%; padding: 0.6rem 2.5rem 0.6rem 0.75rem; border: 0.5px solid rgba(0,0,0,0.2); border-radius: 8px; font-size: 13px; font-family: monospace; color: #1a1a1a; background: white; }
+  .key-input:focus { outline: none; border-color: #2d8a45; }
+  .toggle-vis { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 14px; }
+  .save-key-btn { width: 100%; background: #1a5c2a; color: white; border: none; border-radius: 8px; padding: 0.65rem; font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 0.75rem; }
+  .key-status { display: flex; align-items: center; gap: 6px; font-size: 12px; margin-top: 0.5rem; }
+  .key-status.ok{color:#1a5c2a}.key-status.none{color:#888}
+  .danger-btn { width: 100%; background: none; border: 0.5px solid #e24b4a; color: #a32d2d; border-radius: 8px; padding: 0.6rem; font-size: 13px; cursor: pointer; }
+  .no-api-warning { background: #faeeda; border: 0.5px solid #ef9f27; border-radius: 12px; padding: 1rem; text-align: center; }
+  .no-api-warning p { font-size: 13px; color: #854f0b; margin-bottom: 0.75rem; line-height: 1.5; }
+  .go-settings-btn { background: #854f0b; color: white; border: none; border-radius: 100px; padding: 0.5rem 1.25rem; font-size: 13px; font-weight: 500; cursor: pointer; }
+  .tap-hint { font-size: 11px; color: #888; text-align: center; margin-top: 6px; }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a5c2a; color: white; padding: 0.75rem 1.25rem; border-radius: 100px; font-size: 14px; font-weight: 500; transition: transform 0.3s ease; white-space: nowrap; z-index: 100; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .voice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 0.75rem; }
+  .voice-btn { padding: 0.6rem 0.5rem; border: 0.5px solid rgba(0,0,0,0.1); background: #f5f5f0; border-radius: 8px; font-size: 12px; cursor: pointer; text-align: center; color: #888; }
+  .voice-btn.active { background: #1a5c2a; color: white; border-color: #1a5c2a; font-weight: 500; }
+  .test-btn { width: 100%; margin-top: 0.75rem; padding: 0.55rem; border: 0.5px solid #2d8a45; background: none; color: #1a5c2a; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-top">
+      <div class="logo">
+        <div class="logo-icon">🐾</div>
+        <div>
+          <div class="logo-text">Dierenpaspoort</div>
+          <div class="logo-sub">Level <span id="level">1</span> Ontdekker</div>
+        </div>
+      </div>
+      <button class="settings-btn" onclick="switchTab('settings')">⚙️</button>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;opacity:.8;margin-bottom:4px;">
+      <span>XP</span><span><span id="xp-display">0</span> / <span id="xp-next">100</span></span>
+    </div>
+    <div class="xp-bar-wrap"><div class="xp-bar" id="xp-bar" style="width:0%"></div></div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-pill"><div class="num" id="stat-seen">0</div><div class="lbl">Gezien</div></div>
+    <div class="stat-pill"><div class="num" id="stat-uniq">0</div><div class="lbl">Soorten</div></div>
+    <div class="stat-pill"><div class="num" id="stat-streak">1</div><div class="lbl">Streak</div></div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('scan')">Scannen</div>
+    <div class="tab" onclick="switchTab('collectie')">Collectie</div>
+    <div class="tab" onclick="switchTab('badges')">Badges</div>
+  </div>
+  <div class="panel" id="panel-scan">
+    <div id="no-api-box" class="no-api-warning" style="display:none">
+      <p>Voeg eerst een API-sleutel toe in de instellingen.</p>
+      <button class="go-settings-btn" onclick="switchTab('settings')">Naar instellingen</button>
+    </div>
+    <div id="scan-main">
+      <div class="scan-zone" onclick="document.getElementById('fileInput').click()">
+        <div id="scan-content">
+          <div class="scan-icon">📷</div>
+          <div class="scan-title">Maak een foto van een dier</div>
+          <div class="scan-sub">Hond, vogel, insect — alles telt!</div>
+          <button class="scan-btn" onclick="event.stopPropagation();document.getElementById('fileInput').click()">Foto kiezen</button>
+        </div>
+        <div id="loading-content" style="display:none">
+          <img id="preview" class="preview-img"/>
+          <div class="loading-dots">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <span style="margin-left:4px">AI herkent het dier...</span>
+          </div>
+        </div>
+      </div>
+      <input type="file" id="fileInput" accept="image/*" capture="environment" onchange="handleImage(event)"/>
+      <div class="result-card" id="resultCard">
+        <div class="result-hero">
+          <button class="speak-btn" id="speakBtn" onclick="speakAll()">🔊</button>
+          <span class="result-emoji" id="res-emoji">🐾</span>
+          <div class="result-name" id="res-name">—</div>
+          <span class="rarity-badge" id="res-rarity">—</span>
+        </div>
+        <div class="result-section">
+          <div class="stat-grid">
+            <div class="stat-tile" onclick="speak(this.dataset.speech)" data-speech=""><div class="ico">⚖️</div><div class="val" id="res-weight">—</div></div>
+            <div class="stat-tile" onclick="speak(this.dataset.speech)" data-speech=""><div class="ico">📏</div><div class="val" id="res-length">—</div></div>
+            <div class="stat-tile" onclick="speak(this.dataset.speech)" data-speech=""><div class="ico">🎂</div><div class="val" id="res-age">—</div></div>
+          </div>
+          <div class="tap-hint">Tik op een kaartje om te horen wat het betekent</div>
+        </div>
+        <div class="result-section"><div id="compare-tiles"></div></div>
+        <div class="result-section" style="border-bottom:none"><div id="weetje-tiles"></div></div>
+        <div class="xp-bar-result" id="res-xp"><span>+25 XP verdiend!</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="panel" id="panel-collectie" style="display:none">
+    <div class="collection-grid" id="collectionGrid"></div>
+    <div class="empty-state" id="emptyState">
+      <div class="big">🔭</div>
+      <p>Nog geen dieren gevonden.<br>Ga naar buiten en scan je eerste dier!</p>
+    </div>
+  </div>
+  <div class="panel" id="panel-badges" style="display:none">
+    <div class="section-title">Jouw badges</div>
+    <div id="achievements-list"></div>
+  </div>
+  <div class="panel" id="panel-settings" style="display:none">
+    <div class="settings-card">
+      <div class="settings-label">AI-provider</div>
+      <div class="provider-toggle">
+        <div class="provider-btn active" id="btn-anthropic" onclick="selectProvider('anthropic')">🟠 Anthropic</div>
+        <div class="provider-btn" id="btn-openai" onclick="selectProvider('openai')">🟢 OpenAI</div>
+      </div>
+      <div class="settings-label">API-sleutel</div>
+      <div class="key-input-wrap">
+        <input type="password" class="key-input" id="keyInput" placeholder="Plak hier je API-sleutel..."/>
+        <button class="toggle-vis" onclick="toggleKeyVis('keyInput')">👁</button>
+      </div>
+      <div class="key-status" id="keyStatus"><span>○</span><span>Geen sleutel opgeslagen</span></div>
+      <button class="save-key-btn" onclick="saveKey()">Opslaan</button>
+    </div>
+    <div class="settings-card">
+      <div class="settings-label">Stem (voorlezen)</div>
+      <div class="tts-toggle">
+        <div class="tts-btn active" id="tts-browser" onclick="selectTTS('browser')">🤖 Browser</div>
+        <div class="tts-btn" id="tts-elevenlabs" onclick="selectTTS('elevenlabs')">✨ ElevenLabs</div>
+      </div>
+      <div id="elevenlabs-settings" style="display:none;margin-top:1rem;">
+        <div class="settings-label">ElevenLabs API-sleutel</div>
+        <div class="key-input-wrap">
+          <input type="password" class="key-input" id="elKeyInput" placeholder="Plak je ElevenLabs key..."/>
+          <button class="toggle-vis" onclick="toggleKeyVis('elKeyInput')">👁</button>
+        </div>
+        <div class="key-status" id="elKeyStatus"><span>○</span><span>Geen sleutel opgeslagen</span></div>
+        <div style="margin-top:1rem;">
+          <div class="settings-label">Kies een stem</div>
+          <div class="voice-grid" id="voiceGrid"></div>
+        </div>
+        <button class="test-btn" onclick="testElevenLabs()">🔊 Test stem</button>
+        <button class="save-key-btn" onclick="saveElevenLabs()">Opslaan</button>
+      </div>
+    </div>
+    <div class="settings-card">
+      <div class="settings-label">Info</div>
+      <p style="font-size:13px;color:#888;line-height:1.6;">Alle sleutels worden alleen lokaal opgeslagen in je browser. Ze worden nooit gedeeld.</p>
+    </div>
+    <div class="settings-card">
+      <div class="settings-label">Gevaarlijke zone</div>
+      <button class="danger-btn" onclick="resetAll()">🗑 Reset collectie & XP</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const VOICES=[{id:'cgSgspJ2msm6clMCkdW9',name:'Jessica',desc:'Warm, vriendelijk'},{id:'EXAVITQu4vr4xnSDxMaL',name:'Bella',desc:'Zacht, rustig'},{id:'pNInz6obpgDQGcFmaJgB',name:'Adam',desc:'Helder, jong'},{id:'onwK4e9ZLuTAKqWW03F9',name:'Daniel',desc:'Enthousiast'},{id:'XB0fDUnXU5powFXDhCwa',name:'Charlotte',desc:'Speels'},{id:'nPczCjzI2devNBz1zQrb',name:'Brian',desc:'Avontuurlijk'}];
+const ACHIEVEMENTS=[{id:'first',icon:'🌱',name:'Eerste stap',desc:'Scan je eerste dier',req:s=>s.totalSeen>=1},{id:'five',icon:'⭐',name:'Vijf soorten',desc:'Ontdek 5 soorten',req:s=>s.collection.length>=5},{id:'ten',icon:'🏆',name:'Tien soorten',desc:'Ontdek 10 soorten',req:s=>s.collection.length>=10},{id:'rare',icon:'💎',name:'Geluksvogel',desc:'Ontdek een zeldzaam dier',req:s=>s.foundRare},{id:'streak3',icon:'🔥',name:'Op rij!',desc:'3 dagen achter elkaar',req:s=>s.streak>=3},{id:'xp500',icon:'🌟',name:'XP Meester',desc:'Verdien 500 XP totaal',req:s=>s.totalXP>=500}];
+let state=JSON.parse(localStorage.getItem('dp_state')||'null')||{totalXP:0,level:1,totalSeen:0,streak:1,collection:[],foundRare:false,unlockedAchievements:[]};
+let settings=JSON.parse(localStorage.getItem('dp_settings')||'null')||{provider:'anthropic',apiKey:'',tts:'browser',elKey:'',voiceId:VOICES[0].id};
+let currentAnimal=null;
+function saveState(){localStorage.setItem('dp_state',JSON.stringify(state));}
+function saveSettings(){localStorage.setItem('dp_settings',JSON.stringify(settings));}
+function g(id){return document.getElementById(id);}
+function showToast(msg){const t=g('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+async function speak(text){if(!text)return;if(settings.tts==='elevenlabs'&&settings.elKey){await speakElevenLabs(text);}else{speakBrowser(text);}}
+function speakBrowser(text){window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='nl-NL';u.rate=0.9;u.pitch=1.1;const btn=g('speakBtn');if(btn){btn.style.background='rgba(255,255,255,0.9)';u.onend=()=>btn.style.background='rgba(255,255,255,0.2)';}window.speechSynthesis.speak(u);}
+async function speakElevenLabs(text){const btn=g('speakBtn');if(btn)btn.style.background='rgba(255,255,255,0.9)';try{const res=await fetch('https://api.elevenlabs.io/v1/text-to-speech/'+settings.voiceId,{method:'POST',headers:{'Content-Type':'application/json','xi-api-key':settings.elKey},body:JSON.stringify({text,model_id:'eleven_multilingual_v2',voice_settings:{stability:0.5,similarity_boost:0.8,style:0.4,use_speaker_boost:true}})});if(!res.ok)throw new Error('Status '+res.status);const blob=await res.blob();const url=URL.createObjectURL(blob);const audio=new Audio(url);audio.onended=()=>{if(btn)btn.style.background='rgba(255,255,255,0.2)';URL.revokeObjectURL(url);};audio.play();}catch(err){if(btn)btn.style.background='rgba(255,255,255,0.2)';showToast('Stem fout: '+err.message);speakBrowser(text);}}
+async function speakAll(){if(!currentAnimal)return;const a=currentAnimal;await speak(a.naam+'! '+a.zeldzaamheid+' dier. '+a.vergelijking_gewicht+'. '+a.vergelijking_snelheid+'. '+a.weetjes[0]);}
+async function testElevenLabs(){if(!settings.elKey){showToast('Sla eerst je ElevenLabs key op');return;}await speakElevenLabs('Wauw! Je hebt een tijger gevonden! Dat is een zeldzaam dier!');}
+function updateUI(){const xpFL=state.level*100;const xpIL=state.totalXP-((state.level-1)*100);const pct=Math.min(100,Math.round((xpIL/xpFL)*100));g('xp-display').textContent=xpIL;g('xp-next').textContent=xpFL;g('xp-bar').style.width=pct+'%';g('level').textContent=state.level;g('stat-seen').textContent=state.totalSeen;g('stat-uniq').textContent=state.collection.length;g('stat-streak').textContent=state.streak;}
+function switchTab(tab){['scan','collectie','badges','settings'].forEach(t=>{g('panel-'+t).style.display=t===tab?'block':'none';});document.querySelectorAll('.tab').forEach((el,i)=>{el.classList.toggle('active',['scan','collectie','badges'][i]===tab);});if(tab==='scan')checkApiKey();if(tab==='collectie')renderCollection();if(tab==='badges')renderAchievements();if(tab==='settings')renderSettings();}
+function checkApiKey(){const has=!!settings.apiKey;g('no-api-box').style.display=has?'none':'block';g('scan-main').style.display=has?'block':'none';}
+function selectProvider(p){settings.provider=p;g('btn-anthropic').classList.toggle('active',p==='anthropic');g('btn-openai').classList.toggle('active',p==='openai');}
+function selectTTS(t){settings.tts=t;g('tts-browser').classList.toggle('active',t==='browser');g('tts-elevenlabs').classList.toggle('active',t==='elevenlabs');g('elevenlabs-settings').style.display=t==='elevenlabs'?'block':'none';}
+function toggleKeyVis(id){const i=g(id);i.type=i.type==='password'?'text':'password';}
+function saveKey(){const v=g('keyInput').value.trim();if(!v){showToast('Vul eerst een sleutel in');return;}settings.apiKey=v;saveSettings();renderSettings();showToast('✓ AI-sleutel opgeslagen');}
+function saveElevenLabs(){const v=g('elKeyInput').value.trim();if(!v){showToast('Vul eerst je ElevenLabs key in');return;}settings.elKey=v;saveSettings();renderSettings();showToast('✓ ElevenLabs opgeslagen');}
+function selectVoice(id){settings.voiceId=id;saveSettings();document.querySelectorAll('.voice-btn').forEach(b=>b.classList.toggle('active',b.dataset.vid===id));}
+function renderVoiceGrid(){g('voiceGrid').innerHTML=VOICES.map(v=>'<div class="voice-btn '+(settings.voiceId===v.id?'active':'')+'" data-vid="'+v.id+'" onclick="selectVoice(\''+v.id+'\')"><div style="font-weight:500;">'+v.name+'</div><div style="font-size:10px;opacity:0.8;">'+v.desc+'</div></div>').join('');}
+function renderSettings(){g('btn-anthropic').classList.toggle('active',settings.provider==='anthropic');g('btn-openai').classList.toggle('active',settings.provider==='openai');g('tts-browser').classList.toggle('active',settings.tts==='browser');g('tts-elevenlabs').classList.toggle('active',settings.tts==='elevenlabs');g('elevenlabs-settings').style.display=settings.tts==='elevenlabs'?'block':'none';const s=g('keyStatus');if(settings.apiKey){const m=settings.apiKey.slice(0,6)+'••••'+settings.apiKey.slice(-4);s.className='key-status ok';s.innerHTML='<span>✓</span><span>'+m+'</span>';g('keyInput').value='';g('keyInput').placeholder='Nieuwe sleutel om te wijzigen...';}else{s.className='key-status none';s.innerHTML='<span>○</span><span>Geen sleutel opgeslagen</span>';}const es=g('elKeyStatus');if(settings.elKey){const m=settings.elKey.slice(0,6)+'••••'+settings.elKey.slice(-4);es.className='key-status ok';es.innerHTML='<span>✓</span><span>'+m+'</span>';g('elKeyInput').value='';g('elKeyInput').placeholder='Nieuwe sleutel om te wijzigen...';}else{es.className='key-status none';es.innerHTML='<span>○</span><span>Geen sleutel opgeslagen</span>';}renderVoiceGrid();}
+function resetAll(){if(!confirm('Weet je zeker?'))return;state={totalXP:0,level:1,totalSeen:0,streak:1,collection:[],foundRare:false,unlockedAchievements:[]};saveState();updateUI();showToast('Collectie gereset');}
+function slugify(r){if(!r)return'gewoon';const s=r.toLowerCase().replace(/ /g,'');if(s.includes('super'))return'superschaars';if(s.includes('zeldzaam'))return'zeldzaam';if(s.includes('bijzonder'))return'bijzonder';return'gewoon';}
+function renderCollection(){const grid=g('collectionGrid'),empty=g('emptyState');if(!state.collection.length){grid.style.display='none';empty.style.display='block';return;}grid.style.display='grid';empty.style.display='none';grid.innerHTML=state.collection.map(a=>'<div class="animal-tile" onclick="speak(\''+a.name+'! '+a.times+' keer gezien.\')"><div class="rarity-dot dot-'+slugify(a.rarity)+'"></div><div class="emoji">'+a.emoji+'</div><div class="name">'+a.name+'</div><div class="count">'+a.times+'x</div></div>').join('');}
+function renderAchievements(){g('achievements-list').innerHTML=ACHIEVEMENTS.map(ach=>{const u=state.unlockedAchievements.includes(ach.id);return'<div class="achievement"><div class="ach-icon '+(u?'ach-unlocked':'ach-locked')+'">'+ach.icon+'</div><div style="flex:1"><div class="ach-name">'+ach.name+'</div><div class="ach-desc">'+ach.desc+'</div>'+(u?'':'<div class="pb-wrap"><div class="pb" style="width:'+getP(ach)+'%"></div></div>')+'</div>'+(u?'<span style="font-size:12px;color:#1a5c2a;font-weight:500;">✓</span>':'')+'</div>';}).join('');}
+function getP(ach){if(ach.id==='first')return Math.min(100,state.totalSeen*100);if(ach.id==='five')return Math.min(100,Math.round(state.collection.length/5*100));if(ach.id==='ten')return Math.min(100,Math.round(state.collection.length/10*100));if(ach.id==='streak3')return Math.min(100,Math.round(state.streak/3*100));if(ach.id==='xp500')return Math.min(100,Math.round(state.totalXP/500*100));return 0;}
+function addXP(amount){state.totalXP+=amount;const nl=Math.floor(state.totalXP/100)+1;if(nl>state.level){state.level=nl;setTimeout(()=>{speak('Wauw! Level '+state.level+' bereikt!');showToast('🎉 Level '+state.level+'!');},800);}}
+function checkAchievements(){ACHIEVEMENTS.forEach(ach=>{if(!state.unlockedAchievements.includes(ach.id)&&ach.req(state)){state.unlockedAchievements.push(ach.id);setTimeout(()=>{speak('Gefeliciteerd! Badge behaald: '+ach.name);showToast('🏅 '+ach.name+'!');},1200);}});}
+const PROMPT='Je bent een natuur-AI voor jonge kinderen. Herken het dier en stuur ALLEEN geldige JSON terug, geen uitleg, geen backticks.\n\n{"naam":"Nederlandse naam","emoji":"één emoji","zeldzaamheid":"Gewoon / Bijzonder / Zeldzaam / Superschaars","gewicht":"bijv. 300 kg","lengte":"bijv. 3 meter","leeftijd":"bijv. 15 jaar","vergelijking_gewicht":"vergelijking voor kind van 6, bijv: zo zwaar als 10 kinderen samen","vergelijking_snelheid":"vergelijking voor kind van 6, bijv: zo snel als een brommer","vergelijking_lengte":"vergelijking voor kind van 6, bijv: zo lang als 3 bedden achter elkaar","weetjes":["kort grappig weetje max 10 woorden","kort verbazingwekkend weetje max 10 woorden","kort weetje over gevaar max 10 woorden"],"xp":25,"gevonden":true}\n\nAls er geen dier is: {"gevonden":false}';
+async function callAPI(base64,mediaType){if(settings.provider==='openai'){const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+settings.apiKey},body:JSON.stringify({model:'gpt-4o',max_tokens:1000,messages:[{role:'user',content:[{type:'image_url',image_url:{url:'data:'+mediaType+';base64,'+base64}},{type:'text',text:PROMPT}]}]})});const d=await r.json();if(d.error)throw new Error(d.error.message);return d.choices[0].message.content;}else{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':settings.apiKey,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:mediaType,data:base64}},{type:'text',text:PROMPT}]}]})});const d=await r.json();if(d.error)throw new Error(d.error.message);return d.content.map(c=>c.text||'').join('');}}
+function renderResult(a,isNew,xpGained){currentAnimal=a;const slug=slugify(a.zeldzaamheid);g('res-emoji').textContent=a.emoji;g('res-name').textContent=a.naam;const rb=g('res-rarity');rb.textContent=(slug==='superschaars'?'💎 ':slug==='zeldzaam'?'⭐ ':slug==='bijzonder'?'✨ ':'')+a.zeldzaamheid;rb.className='rarity-badge rarity-'+slug;const tiles=document.querySelectorAll('.stat-tile');tiles[0].dataset.speech='Dit dier weegt '+a.gewicht+'. '+a.vergelijking_gewicht;tiles[1].dataset.speech='Dit dier is '+a.lengte+' lang. '+a.vergelijking_lengte;tiles[2].dataset.speech='Dit dier wordt '+a.leeftijd+' oud.';g('res-weight').textContent=a.gewicht;g('res-length').textContent=a.lengte;g('res-age').textContent=a.leeftijd;const cico=['🏃','⚖️','📏'];const cverg=[a.vergelijking_snelheid,a.vergelijking_gewicht,a.vergelijking_lengte];g('compare-tiles').innerHTML=cverg.map((v,i)=>'<div class="compare-tile" onclick="speak(\''+v.replace(/'/g,"\\'")+'\')" ><span class="cico">'+cico[i]+'</span><span class="ctxt">'+v+'</span></div>').join('');const kleur=['groen','blauw','oranje'],wico=['👆','🌊','⚠️'];g('weetje-tiles').innerHTML=(a.weetjes||[]).map((w,i)=>'<div class="weetje-tile '+kleur[i]+'" onclick="speak(\''+w.replace(/'/g,"\\'")+'\')"><span class="wico">'+wico[i]+'</span><span class="wtxt">'+w+'</span></div>').join('');g('res-xp').innerHTML='<span>+'+xpGained+' XP verdiend!</span>'+(isNew?'<span class="new-badge">Nieuw!</span>':'');g('resultCard').classList.add('show');setTimeout(()=>speakAll(),600);}
+async function handleImage(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=async(e)=>{const base64=e.target.result.split(',')[1],mediaType=file.type||'image/jpeg';g('scan-content').style.display='none';g('loading-content').style.display='block';g('preview').src=e.target.result;g('resultCard').classList.remove('show');try{const text=await callAPI(base64,mediaType);const a=JSON.parse(text.trim().replace(/```json|```/g,'').trim());g('loading-content').style.display='none';g('scan-content').style.display='block';if(!a.gevonden){speak('Geen dier gevonden. Probeer een andere foto!');showToast('Geen dier herkend');return;}const isNew=!state.collection.find(x=>x.name===a.naam);const existing=state.collection.find(x=>x.name===a.naam);if(isNew)state.collection.push({name:a.naam,emoji:a.emoji,rarity:a.zeldzaamheid,times:1});else existing.times++;state.totalSeen++;const xp=isNew?(a.xp||25):Math.round((a.xp||25)*0.4);addXP(xp);if(a.zeldzaamheid==='Zeldzaam'||a.zeldzaamheid==='Superschaars')state.foundRare=true;checkAchievements();saveState();updateUI();renderResult(a,isNew,xp);}catch(err){g('loading-content').style.display='none';g('scan-content').style.display='block';speak('Oeps, iets ging mis. Probeer opnieuw!');showToast('Fout: '+(err.message||'probeer opnieuw'));}event.target.value='';};reader.readAsDataURL(file);}
+updateUI();renderSettings();checkApiKey();
+</script>
+</body>
+</html>
