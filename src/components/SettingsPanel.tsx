@@ -58,7 +58,8 @@ export function SettingsPanel() {
     }
     setElKey(v)
     setElKeyInput('')
-    showToast('ElevenLabs opgeslagen')
+    setTTS('elevenlabs')
+    showToast('ElevenLabs opgeslagen – voorlezen gebruikt nu ElevenLabs')
   }
 
   const handleTestElevenLabs = async () => {
