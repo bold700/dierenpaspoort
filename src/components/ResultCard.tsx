@@ -67,13 +67,13 @@ export function ResultCard({ animal, xpGained, isNew, onSpeakAll }: ResultCardPr
         </div>
       </div>
 
-      <div className="nes-container is-rounded mt-2">
-        <p className="nes-text is-disabled text-xs text-center mb-3">Tik om te horen</p>
+      <div className="nes-container is-rounded is-dark with-title mt-2">
+        <p className="title">Tik om te horen</p>
         <div className="grid grid-cols-3 gap-2 mb-4">
           <button
             type="button"
             onClick={() => speak(weightSpeech)}
-            className="nes-container is-rounded py-3 px-2 text-center cursor-pointer"
+            className="nes-container is-rounded is-dark py-3 px-2 text-center cursor-pointer"
           >
             <NesIcon name="circle" size="2x" />
             <div className="nes-text is-primary text-xs mt-1">{animal.gewicht}</div>
@@ -81,7 +81,7 @@ export function ResultCard({ animal, xpGained, isNew, onSpeakAll }: ResultCardPr
           <button
             type="button"
             onClick={() => speak(lengthSpeech)}
-            className="nes-container is-rounded py-3 px-2 text-center cursor-pointer"
+            className="nes-container is-rounded is-dark py-3 px-2 text-center cursor-pointer"
           >
             <NesIcon name="caret-right" size="2x" />
             <div className="nes-text is-primary text-xs mt-1">{animal.lengte}</div>
@@ -89,7 +89,7 @@ export function ResultCard({ animal, xpGained, isNew, onSpeakAll }: ResultCardPr
           <button
             type="button"
             onClick={() => speak(ageSpeech)}
-            className="nes-container is-rounded py-3 px-2 text-center cursor-pointer"
+            className="nes-container is-rounded is-dark py-3 px-2 text-center cursor-pointer"
           >
             <NesIcon name="calendar" size="2x" />
             <div className="nes-text is-primary text-xs mt-1">{animal.leeftijd}</div>
@@ -102,7 +102,7 @@ export function ResultCard({ animal, xpGained, isNew, onSpeakAll }: ResultCardPr
               key={i}
               type="button"
               onClick={() => speak(item.text)}
-              className="nes-container is-rounded w-full py-2 px-3 flex items-center gap-2 text-left cursor-pointer"
+              className="nes-container is-rounded is-dark w-full py-2 px-3 flex items-center gap-2 text-left cursor-pointer"
             >
               <NesIcon name={item.icon} />
               <span className="nes-text is-disabled text-sm">{item.text}</span>
@@ -117,7 +117,7 @@ export function ResultCard({ animal, xpGained, isNew, onSpeakAll }: ResultCardPr
                 key={i}
                 type="button"
                 onClick={() => speak(w)}
-                className="nes-container is-rounded w-full py-2 px-3 flex items-center gap-2 text-left cursor-pointer"
+                className="nes-container is-rounded is-dark w-full py-2 px-3 flex items-center gap-2 text-left cursor-pointer"
               >
                 <NesIcon name={wicon[i % 3]} />
                 <span className="nes-text is-disabled text-sm">{w}</span>

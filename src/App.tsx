@@ -17,11 +17,11 @@ function StatsRow() {
     { value: streak, label: 'Streak' },
   ]
   return (
-    <div className="flex gap-3 mb-4">
+    <div className="flex gap-2 sm:gap-3 mb-4 min-w-0">
       {items.map(({ value, label }) => (
-        <div key={label} className="nes-container is-rounded is-dark flex-1 text-center py-3">
-          <div className="nes-text is-primary text-2xl font-bold leading-none">{value}</div>
-          <div className="nes-text is-disabled text-xs mt-1">{label}</div>
+        <div key={label} className="nes-container is-rounded is-dark flex-1 min-w-0 text-center py-2 sm:py-3">
+          <div className="nes-text is-primary text-lg sm:text-2xl font-bold leading-none">{value}</div>
+          <div className="nes-text is-disabled text-[10px] sm:text-xs mt-0.5 sm:mt-1 truncate">{label}</div>
         </div>
       ))}
     </div>
@@ -30,13 +30,13 @@ function StatsRow() {
 
 function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-4 w-full">
+    <div className="mx-2 sm:mx-4 w-full min-w-0">
       <Header />
-      <div className="nes-container is-rounded with-title is-dark mb-6 w-full">
+      <div className="nes-container is-rounded with-title is-dark mb-6 w-full min-w-0 overflow-hidden">
         <p className="title">Scherm</p>
         <StatsRow />
         <TabBar />
-        <div className="mt-4">{children}</div>
+        <div className="mt-4 min-w-0">{children}</div>
       </div>
     </div>
   )
@@ -53,7 +53,7 @@ export default function App() {
           <Route
             path="/settings"
             element={
-              <div className="mx-4 w-full">
+              <div className="mx-2 sm:mx-4 w-full min-w-0">
                 <Header />
                 <div className="nes-container is-rounded with-title is-dark mb-6 w-full">
                   <p className="title">Instellingen</p>

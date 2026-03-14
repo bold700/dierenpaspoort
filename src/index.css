@@ -89,6 +89,19 @@ body::-webkit-scrollbar {
 .nes-input:not(.is-dark)::placeholder {
   color: #6b7280;
 }
+
+/* Tab-bar: compacter op mobile zodat Scannen / Collectie / Badges passen */
+.tab-bar .nes-btn {
+  margin: 2px;
+  padding: 4px 6px;
+}
+@media (min-width: 640px) {
+  .tab-bar .nes-btn {
+    margin: 4px;
+    padding: 6px 8px;
+  }
+}
+
 /* Progress bars: donkere track (#363b42) voor alle varianten, NES-kleuren voor vulling */
 .nes-progress {
   background-color: #363b42;
@@ -172,6 +185,11 @@ body::-webkit-scrollbar {
 .nes-btn.is-disabled,
 .nes-btn.is-disabled:hover {
   color: #212529;
+}
+
+/* Stemkiezer: geselecteerde knop (blauw) → witte tekst voor leesbaarheid */
+.voice-option.is-primary .nes-text {
+  color: #fff !important;
 }
 
 /* Links als NES-knoppen:zelfde uiterlijk als <button class="nes-btn"> */

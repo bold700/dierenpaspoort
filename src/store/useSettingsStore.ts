@@ -1,6 +1,9 @@
 import { create } from 'zustand'
 import type { AIProvider, TTSProvider } from '../types'
 import { VOICES } from '../constants'
+import type { AllIconId } from '../assets/nes-icons'
+
+export type ProfileIconName = AllIconId
 
 export interface SettingsState {
   provider: AIProvider
@@ -8,6 +11,7 @@ export interface SettingsState {
   tts: TTSProvider
   elKey: string
   voiceId: string
+  profileIcon: ProfileIconName
 }
 
 const STORAGE_KEY = 'dp_settings'
@@ -29,7 +33,8 @@ function getDefault(): SettingsState {
     apiKey: '',
     tts: 'browser',
     elKey: '',
-    voiceId: VOICES[0].id
+    voiceId: VOICES[0].id,
+    profileIcon: 'heart'
   }
 }
 
@@ -45,6 +50,7 @@ export const useSettingsStore = create<SettingsState & {
   setTTS: (t: TTSProvider) => void
   setElKey: (k: string) => void
   setVoiceId: (id: string) => void
+  setProfileIcon: (icon: ProfileIconName) => void
   hasApiKey: () => boolean
   hasElKey: () => boolean
 }>((set, get) => ({
@@ -69,6 +75,10 @@ export const useSettingsStore = create<SettingsState & {
   setVoiceId(voiceId) {
     set({ voiceId })
     save({ ...get(), voiceId })
+  },
+  setProfileIcon(profileIcon) {
+    set({ profileIcon })
+    save({ ...get(), profileIcon })
   },
   hasApiKey() {
     return !!get().apiKey

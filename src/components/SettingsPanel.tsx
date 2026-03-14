@@ -4,6 +4,7 @@ import { useSettingsStore } from '../store/useSettingsStore'
 import { useAppStore } from '../store/useAppStore'
 import { useSpeak } from '../hooks/useSpeak'
 import { VOICES } from '../constants'
+import { ALL_ICON_IDS } from '../assets/nes-icons'
 import { NesIcon } from './NesIcon'
 
 export function SettingsPanel() {
@@ -19,11 +20,13 @@ export function SettingsPanel() {
     tts,
     elKey,
     voiceId,
+    profileIcon,
     setProvider,
     setApiKey,
     setTTS,
     setElKey,
     setVoiceId,
+    setProfileIcon,
     hasElKey,
   } = useSettingsStore()
 
@@ -82,19 +85,38 @@ export function SettingsPanel() {
   return (
     <div className="space-y-4 pb-8">
       <div className="nes-container is-rounded is-dark">
+        <p className="nes-text is-primary text-xs font-bold mb-3">Profielicoon</p>
+        <div className="flex flex-wrap gap-2">
+          {ALL_ICON_IDS.map((id) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setProfileIcon(id)}
+              className={`nes-container is-rounded is-dark flex items-center justify-center w-10 h-10 p-0 cursor-pointer ${
+                profileIcon === id ? 'ring-2 ring-[#209cee]' : ''
+              }`}
+              aria-label={`Icoon ${id}`}
+            >
+              <NesIcon name={id} />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="nes-container is-rounded is-dark">
         <p className="nes-text is-primary text-xs font-bold mb-2">AI-provider</p>
-        <div className="flex gap-2 mb-4">
+        <div className="flex flex-nowrap gap-2 mb-4 min-w-0">
           <button
             type="button"
             onClick={() => setProvider('anthropic')}
-            className={`nes-btn flex-1 ${provider === 'anthropic' ? 'is-primary' : ''}`}
+            className={`nes-btn flex-1 min-w-0 text-xs sm:text-base ${provider === 'anthropic' ? 'is-primary' : ''}`}
           >
             Anthropic
           </button>
           <button
             type="button"
             onClick={() => setProvider('openai')}
-            className={`nes-btn flex-1 ${provider === 'openai' ? 'is-primary' : ''}`}
+            className={`nes-btn flex-1 min-w-0 text-xs sm:text-base ${provider === 'openai' ? 'is-primary' : ''}`}
           >
             OpenAI
           </button>
@@ -125,20 +147,20 @@ export function SettingsPanel() {
 
       <div className="nes-container is-rounded is-dark">
         <p className="nes-text is-primary text-xs font-bold mb-2">Stem (voorlezen)</p>
-        <div className="flex gap-2 mb-4">
+        <div className="flex flex-nowrap gap-2 mb-4 min-w-0">
           <button
             type="button"
             onClick={() => setTTS('browser')}
-            className={`nes-btn flex-1 ${tts === 'browser' ? 'is-primary' : ''}`}
+            className={`nes-btn flex-1 min-w-0 text-xs sm:text-base whitespace-nowrap ${tts === 'browser' ? 'is-primary' : ''}`}
           >
-            <NesIcon name="cog" className="mr-1" /> Browser
+            <NesIcon name="cog" className="mr-1 shrink-0" /> Browser
           </button>
           <button
             type="button"
             onClick={() => setTTS('elevenlabs')}
-            className={`nes-btn flex-1 ${tts === 'elevenlabs' ? 'is-primary' : ''}`}
+            className={`nes-btn flex-1 min-w-0 text-xs sm:text-base whitespace-nowrap ${tts === 'elevenlabs' ? 'is-primary' : ''}`}
           >
-            <NesIcon name="star" className="mr-1" /> ElevenLabs
+            <NesIcon name="star" className="mr-1 shrink-0" /> ElevenLabs
           </button>
         </div>
 
@@ -170,10 +192,10 @@ export function SettingsPanel() {
                   key={v.id}
                   type="button"
                   onClick={() => setVoiceId(v.id)}
-                  className={`nes-btn text-left text-sm ${voiceId === v.id ? 'is-primary' : ''}`}
+                  className={`voice-option nes-btn text-left text-sm min-w-0 overflow-hidden ${voiceId === v.id ? 'is-primary' : ''}`}
                 >
-                  <div className="nes-text is-primary font-bold">{v.name}</div>
-                  <div className="nes-text is-disabled text-[10px]">{v.desc}</div>
+                  <div className="nes-text is-primary font-bold truncate">{v.name}</div>
+                  <div className="nes-text is-disabled text-[10px] truncate mt-0.5">{v.desc}</div>
                 </button>
               ))}
             </div>

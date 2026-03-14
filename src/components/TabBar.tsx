@@ -9,13 +9,16 @@ const tabs = [
 
 export function TabBar() {
   return (
-    <nav className="flex gap-2">
+    <nav className="tab-bar flex gap-1 sm:gap-2 min-w-0">
       {tabs.map(({ to, label }) => (
         <NavLink
           key={to}
           to={to}
           className={({ isActive }) =>
-            cn('nes-btn flex-1 text-center', isActive && 'is-primary')
+            cn(
+              'nes-btn flex-1 min-w-0 text-center text-[10px] sm:text-xs md:text-sm px-1 sm:px-2',
+              isActive && 'is-primary'
+            )
           }
         >
           {label}

@@ -44,3 +44,11 @@ export const nesIconSvgs: Record<string, string> = {
   user,
   users
 }
+
+/** Alle icon-namen (voor bijv. profielicoon-kiezer) */
+export const ALL_ICON_IDS = [
+  'heart', 'star', 'trophy', 'user', 'users', 'circle', 'play', 'search', 'calendar',
+  'caret-right', 'check', 'check-circle', 'square', 'comment', 'exclamation', 'exclamation-triangle',
+  'eye', 'eye-slash', 'cog', 'times', 'ban'
+] as const
+export type AllIconId = (typeof ALL_ICON_IDS)[number]
