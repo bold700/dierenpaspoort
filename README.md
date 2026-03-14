@@ -24,6 +24,12 @@ npm run build
 
 De output staat in `dist/`. Deploy naar Vercel, Netlify of een andere static host (geen backend nodig).
 
+### GitHub Pages
+
+1. Push code naar GitHub; de workflow **Deploy naar GitHub Pages** bouwt automatisch en deployt `dist/`.
+2. **Belangrijk:** in de repo ga je naar **Settings → Pages**. Zet bij **Source** op **GitHub Actions** (niet op "Deploy from a branch"). Anders wordt je broncode geserveerd in plaats van de gebouwde app en krijg je 404 op `/src/main.tsx`.
+3. De site staat op `https://<username>.github.io/dierenpaspoort/`.
+
 ## Instellingen
 
 1. Ga naar ⚙️ Instellingen.
