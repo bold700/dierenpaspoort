@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppStore } from '../store/useAppStore'
 import { useSpeak } from '../hooks/useSpeak'
+import { useTranslations } from '../i18n/useTranslations'
 import { ResultCard } from './ResultCard'
 import { AnimalImage } from './AnimalImage'
 import type { CollectionItem } from '../types'
@@ -22,22 +23,33 @@ const dotColor: Record<string, string> = {
 }
 
 export function CollectionGrid() {
+  const { t } = useTranslations()
   const collection = useAppStore((s) => s.collection)
   const { speak } = useSpeak()
   const [selected, setSelected] = useState<CollectionItem | null>(null)
+
+  const rarityToKey = useCallback((r: string) => {
+    const s = (r ?? '').toLowerCase()
+    if (s.includes('super')) return 'raritySuperschaars'
+    if (s.includes('zeldzaam')) return 'rarityZeldzaam'
+    if (s.includes('bijzonder')) return 'rarityBijzonder'
+    return 'rarityGewoon'
+  }, [])
 
   const speakAllFor = useCallback(
     (item: CollectionItem) => {
       if (item.detail) {
         const a = item.detail
+        const typeKey = a.type === 'dinosaurus' ? 'speakTypeDino' : a.type === 'fantasie' ? 'speakTypeFantasie' : 'speakTypeDier'
+        const rarityKey = rarityToKey(a.zeldzaamheid)
         speak(
-          `${a.naam}! ${a.zeldzaamheid} dier. ${a.vergelijking_gewicht}. ${a.vergelijking_snelheid}. ${a.weetjes?.[0] ?? ''}`
+          `${a.naam}! ${t(rarityKey)} ${t(typeKey)}. ${a.vergelijking_gewicht}. ${a.vergelijking_snelheid}. ${a.weetjes?.[0] ?? ''}`
         )
       } else {
-        speak(`${item.name}! ${item.times} keer gezien.`)
+        speak(t('collectionSpeakTimes', { name: item.name, times: item.times }))
       }
     },
-    [speak]
+    [speak, t, rarityToKey]
   )
 
   if (!collection.length) {
@@ -46,10 +58,10 @@ export function CollectionGrid() {
         <div className="flex justify-center mb-3">
           <i className="nes-icon search size-4x" aria-hidden />
         </div>
-        <p className="nes-text is-primary font-bold mb-2">Nog geen dieren gevonden.</p>
-        <p className="nes-text is-disabled text-sm mb-4">Ga naar buiten en scan je eerste dier!</p>
+        <p className="nes-text is-primary font-bold mb-2">{t('collectionEmptyTitle')}</p>
+        <p className="nes-text is-disabled text-sm mb-4">{t('collectionEmptySubtitle')}</p>
         <Link to="/" className="nes-btn is-primary">
-          Scannen
+          {t('tabsScan')}
         </Link>
       </div>
     )
@@ -64,7 +76,7 @@ export function CollectionGrid() {
             onClick={() => setSelected(null)}
             className="nes-btn is-primary"
           >
-            ← Terug naar collectie
+            {t('collectionBack')}
           </button>
           {selected.detail ? (
             <ResultCard
@@ -80,10 +92,10 @@ export function CollectionGrid() {
               <p className="title">{selected.name}</p>
               <div className="flex flex-col items-center gap-2 py-4">
                 <AnimalImage naam={selected.name} emoji={selected.emoji} size={80} />
-                <span className="nes-badge is-primary">{selected.rarity}</span>
-                <p className="nes-text is-disabled text-sm m-0">{selected.times}x gezien</p>
+                <span className="nes-badge is-primary">{t(rarityToKey(selected.rarity))}</span>
+                <p className="nes-text is-disabled text-sm m-0">{selected.times} {t('collectionTimesSeen')}</p>
                 <p className="nes-text is-disabled text-xs m-0 text-center">
-                  Scan dit dier opnieuw om gewicht, lengte en weetjes te bewaren en hier te zien.
+                  {t('collectionRescanHint')}
                 </p>
               </div>
             </div>
@@ -109,7 +121,7 @@ export function CollectionGrid() {
                 <AnimalImage naam={a.name} emoji={a.emoji} size={52} />
               </div>
               <div className="nes-text is-primary text-[11px] font-bold truncate break-words min-w-0">{a.name}</div>
-              <div className="nes-text is-disabled text-[10px]">{a.times}x</div>
+              <div className="nes-text is-disabled text-[10px]">{a.times} {t('collectionTimesSeen')}</div>
             </button>
           )
         })}

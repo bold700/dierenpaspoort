@@ -1,16 +1,19 @@
 import { useSpeak } from '../hooks/useSpeak'
-import { LEER_DIEREN } from '../data/leerDieren'
+import { useTranslations } from '../i18n/useTranslations'
+import { getLeerDierenWithLocale } from '../data/leerDieren'
 import type { LeerDier } from '../data/leerDieren'
 import { NesIcon } from './NesIcon'
 import { AnimalImage } from './AnimalImage'
 
-const CATEGORIE_LABEL: Record<LeerDier['categorie'], string> = {
-  zoogdier: 'Zoogdieren',
-  vogel: 'Vogels',
-  reptiel: 'Reptielen',
-  insect: 'Insecten',
-  water: 'Waterdieren',
-  overig: 'Overig',
+const CATEGORIE_KEY: Record<LeerDier['categorie'], string> = {
+  zoogdier: 'catZoogdier',
+  vogel: 'catVogel',
+  reptiel: 'catReptiel',
+  insect: 'catInsect',
+  water: 'catWater',
+  dinosaurus: 'catDinosaurus',
+  fantasie: 'catFantasie',
+  overig: 'catOverig',
 }
 
 function pickRandom<T>(arr: [T, T, T, T, T]): T {
@@ -19,7 +22,8 @@ function pickRandom<T>(arr: [T, T, T, T, T]): T {
 
 function DierKaart({ dier }: { dier: LeerDier }) {
   const { speak } = useSpeak()
-  const teZeggen = `Dit is een ${dier.naam}. ${pickRandom(dier.weetjes)}`
+  const { t } = useTranslations()
+  const teZeggen = `${t('learnThisIs')} ${dier.naam}. ${pickRandom(dier.weetjes)}`
 
   return (
     <button
@@ -29,7 +33,7 @@ function DierKaart({ dier }: { dier: LeerDier }) {
       aria-label={`Luister naar ${dier.naam}`}
     >
       <AnimalImage naam={dier.naam} emoji={dier.emoji} size={64} />
-      <span className="nes-text is-primary text-sm font-bold leading-tight line-clamp-2 break-words min-w-0">
+      <span className="nes-text is-primary text-sm font-bold leading-tight line-clamp-2 break-words min-w-0 w-full text-center">
         {dier.kort ?? dier.naam}
       </span>
     </button>
@@ -37,7 +41,9 @@ function DierKaart({ dier }: { dier: LeerDier }) {
 }
 
 export function LeerPanel() {
-  const perCategorie = LEER_DIEREN.reduce<Record<LeerDier['categorie'], LeerDier[]>>(
+  const { t, locale } = useTranslations()
+  const dieren = getLeerDierenWithLocale(locale)
+  const perCategorie = dieren.reduce<Record<LeerDier['categorie'], LeerDier[]>>(
     (acc, d) => {
       if (!acc[d.categorie]) acc[d.categorie] = []
       acc[d.categorie].push(d)
@@ -45,14 +51,14 @@ export function LeerPanel() {
     },
     {} as Record<LeerDier['categorie'], LeerDier[]>
   )
-  const volgorde: LeerDier['categorie'][] = ['zoogdier', 'vogel', 'reptiel', 'insect', 'water', 'overig']
+  const volgorde: LeerDier['categorie'][] = ['zoogdier', 'vogel', 'reptiel', 'insect', 'water', 'dinosaurus', 'fantasie', 'overig']
 
   return (
     <div className="space-y-6">
       <div className="nes-container is-rounded is-dark py-2 px-3 flex items-center gap-2">
         <NesIcon name="comment" size="2x" />
         <p className="nes-text is-disabled text-sm m-0">
-          Tik op een dier om de naam en een leuk weetje te horen.
+          {t('learnHint')}
         </p>
       </div>
 
@@ -62,7 +68,7 @@ export function LeerPanel() {
         return (
           <section key={cat}>
             <h2 className="nes-text is-primary text-sm font-bold mb-2">
-              {CATEGORIE_LABEL[cat]}
+              {t(CATEGORIE_KEY[cat])}
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {dieren.map((d) => (

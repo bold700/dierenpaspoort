@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import type { AnimalResult } from '../types'
 import { useSpeak } from '../hooks/useSpeak'
+import { useTranslations } from '../i18n/useTranslations'
 import { NesIcon } from './NesIcon'
 import { AnimalImage } from './AnimalImage'
 
@@ -19,11 +20,18 @@ const rarityBadgeClass: Record<string, string> = {
   gewoon: 'is-success',
 }
 
-const typeLabel: Record<string, string> = {
-  plaatje: 'Plaatje',
-  speelgoed: 'Speelgoed',
-  dinosaurus: 'Dino!',
-  fantasie: 'Fantasie',
+const RARITY_KEYS: Record<string, string> = {
+  gewoon: 'rarityGewoon',
+  bijzonder: 'rarityBijzonder',
+  zeldzaam: 'rarityZeldzaam',
+  superschaars: 'raritySuperschaars',
+}
+
+const TYPE_KEYS: Record<string, string> = {
+  plaatje: 'typePlaatje',
+  speelgoed: 'typeSpeelgoed',
+  dinosaurus: 'typeDinosaurus',
+  fantasie: 'typeFantasie',
 }
 
 interface ResultCardProps {
@@ -39,19 +47,20 @@ interface ResultCardProps {
 }
 
 export function ResultCard({ animal, xpGained, isNew, onSpeakAll, onSpeakIntro, fromCollection, times }: ResultCardProps) {
+  const { t } = useTranslations()
   const { speak } = useSpeak()
   const slug = slugify(animal.zeldzaamheid)
 
   useEffect(() => {
     if (fromCollection) return
     const sayFirst = onSpeakIntro ?? onSpeakAll
-    const t = setTimeout(sayFirst, 600)
-    return () => clearTimeout(t)
+    const timeoutId = setTimeout(sayFirst, 600)
+    return () => clearTimeout(timeoutId)
   }, [animal.naam, onSpeakAll, onSpeakIntro, fromCollection])
 
-  const weightSpeech = `Dit dier weegt ${animal.gewicht}. ${animal.vergelijking_gewicht}`
-  const lengthSpeech = `Dit dier is ${animal.lengte} lang. ${animal.vergelijking_lengte}`
-  const ageSpeech = `Dit dier wordt ${animal.leeftijd} oud.`
+  const weightSpeech = `${t('resultWeightPrefix')} ${animal.gewicht}. ${animal.vergelijking_gewicht}`
+  const lengthSpeech = `${t('resultLengthPrefix')} ${animal.lengte} ${t('resultLengthSuffix')}. ${animal.vergelijking_lengte}`
+  const ageSpeech = `${t('resultAgePrefix')} ${animal.leeftijd} ${t('resultAgeSuffix')}.`
 
   const compareItems: { icon: 'caret-right' | 'square' | 'check'; text: string }[] = [
     { icon: 'caret-right', text: animal.vergelijking_snelheid },
@@ -66,8 +75,8 @@ export function ResultCard({ animal, xpGained, isNew, onSpeakAll, onSpeakIntro, 
       <div className="nes-container is-rounded with-title is-dark mb-0">
         <p className="title flex flex-wrap items-center justify-center gap-2">
           <span className="nes-text is-primary">{animal.naam}</span>
-          {animal.type && typeLabel[animal.type.toLowerCase()] && (
-            <span className="nes-badge is-warning text-[10px]">{typeLabel[animal.type.toLowerCase()]}</span>
+          {animal.type && TYPE_KEYS[animal.type.toLowerCase()] && (
+            <span className="nes-badge is-warning text-[10px]">{t(TYPE_KEYS[animal.type.toLowerCase()])}</span>
           )}
         </p>
         <div className="flex flex-wrap items-center justify-center gap-2 relative py-2">
@@ -76,19 +85,19 @@ export function ResultCard({ animal, xpGained, isNew, onSpeakAll, onSpeakIntro, 
             onClick={onSpeakAll}
             className="nes-btn absolute top-2 right-2 min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center"
             style={{ padding: '0.5rem 0.75rem' }}
-            aria-label="Alles voorlezen"
+            aria-label={t('resultReadAll')}
           >
             <NesIcon name="play" size="2x" />
           </button>
           <AnimalImage naam={animal.naam} emoji={animal.emoji} size={88} className="shrink-0" />
           <span className={`nes-badge ${rarityBadgeClass[slug] ?? 'is-success'}`}>
-            <span>{animal.zeldzaamheid}</span>
+            <span>{t(RARITY_KEYS[slug] ?? 'rarityGewoon')}</span>
           </span>
         </div>
       </div>
 
       <div className="nes-container is-rounded is-dark with-title mt-2">
-        <p className="title">Tik om te horen</p>
+        <p className="title">{t('resultTapToHear')}</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
           <button
             type="button"
@@ -149,10 +158,10 @@ export function ResultCard({ animal, xpGained, isNew, onSpeakAll, onSpeakIntro, 
 
       <div className="nes-container is-rounded is-dark mt-2 py-2 px-3 flex flex-wrap items-center justify-center gap-2">
         {fromCollection && times != null ? (
-          <span className="nes-text is-disabled">{times}x gezien</span>
+          <span className="nes-text is-disabled">{times} {t('resultTimesSeen')}</span>
         ) : (
           <>
-            <span className="nes-text is-success">+{xpGained} XP</span>
+            <span className="nes-text is-success">{t('resultXpGained', { n: xpGained })}</span>
             {isNew && (
               <span className="nes-badge is-primary">
                 <span>Nieuw!</span>

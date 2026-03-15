@@ -1,59 +1,75 @@
-export type DierCategorie = 'zoogdier' | 'vogel' | 'reptiel' | 'insect' | 'water' | 'overig'
+import type { Locale } from '../i18n/translations'
+import { LEER_CONTENT } from './leerContent'
 
-export interface LeerDier {
+export type DierCategorie = 'zoogdier' | 'vogel' | 'reptiel' | 'insect' | 'water' | 'dinosaurus' | 'fantasie' | 'overig'
+
+export interface LeerDierBase {
   id: string
-  naam: string
-  /** Korte weergavenaam op de kaart (bij lange namen). */
-  kort?: string
   emoji: string
-  beschrijving: string
-  /** Vijf weetjes; bij tikken wordt er willekeurig één uitgesproken. */
-  weetjes: [string, string, string, string, string]
   categorie: DierCategorie
 }
 
-/** Dieren om te ontdekken en te beluisteren — tik om te horen. */
-export const LEER_DIEREN: LeerDier[] = [
-  // Zoogdieren
-  { id: 'leeuw', naam: 'Leeuw', emoji: '🦁', categorie: 'zoogdier', beschrijving: 'De leeuw is de koning van de savanne.', weetjes: ['Hij heeft een grote manen en brult heel hard.', 'Leeuwen slapen wel twintig uur per dag!', 'De leeuw is de koning van de savanne.', 'Alleen de mannetjesleeuw heeft een manen.', 'Leeuwen jagen vaak in een groep.'] },
-  { id: 'olifant', naam: 'Olifant', emoji: '🐘', categorie: 'zoogdier', beschrijving: 'De olifant is het zwaarste landdier.', weetjes: ['Zijn slurf is eigenlijk zijn neus!', 'Hij kan met zijn slurf drinken en vriendjes groeten.', 'Olifanten onthouden heel goed.', 'De olifant is het zwaarste dier op het land.', 'Olifanten leven in grote families.'] },
-  { id: 'giraffe', naam: 'Giraffe', emoji: '🦒', categorie: 'zoogdier', beschrijving: 'De giraffe is het langste dier ter wereld.', weetjes: ['Zijn nek is zo lang dat hij bij de hoogste blaadjes kan.', 'Elke giraffe heeft unieke vlekken, net als een vingerafdruk.', 'Een giraffe heeft een hele lange tong!', 'Giraffen slapen maar heel kort per nacht.', 'Baby giraffen zijn al bijna twee meter bij de geboorte.'] },
-  { id: 'panda', naam: 'Reuzenpanda', kort: 'Panda', emoji: '🐼', categorie: 'zoogdier', beschrijving: 'De reuzenpanda eet bijna alleen bamboe.', weetjes: ['Hij woont in China en heeft een zwart-wit pak.', "Panda's zijn heel zeldzaam en worden beschermd.", 'Een panda eet bijna de hele dag bamboe.', 'Reuzenpanda\'s zijn dol op bamboe.', 'Er zijn niet zo veel reuzenpanda\'s meer in het wild.'] },
-  { id: 'dolfijn', naam: 'Dolfijn', emoji: '🐬', categorie: 'zoogdier', beschrijving: 'Dolfijnen zijn superslimme zoogdieren.', weetjes: ['Ze praten met piepjes en klikjes.', 'Ze springen graag uit het water.', 'Dolfijnen zwemmen vaak in groepen.', 'Ze kunnen elkaar roepen met hun eigen naam!', 'Dolfijnen slapen met één oog open.'] },
-  { id: 'tijger', naam: 'Tijger', emoji: '🐯', categorie: 'zoogdier', beschrijving: 'De tijger is de grootste kat ter wereld.', weetjes: ['Hij heeft oranje vacht met zwarte strepen.', 'Elke tijger heeft andere strepen, net als vingerafdrukken.', 'Tijgers kunnen heel goed zwemmen.', 'Een tijger brult heel hard!', 'Tijgers jagen het liefst in de schemering.'] },
-  { id: 'wolf', naam: 'Wolf', emoji: '🐺', categorie: 'zoogdier', beschrijving: 'Wolven leven in een roedel.', weetjes: ['Ze huilen naar de maan om met elkaar te praten.', 'In Nederland zijn weer een paar wolven in het wild.', 'Een roedel is de familie van de wolf.', 'Wolven hebben een hele scherpe neus.', 'Wolven lopen heel ver op één dag.'] },
-  { id: 'aap', naam: 'Chimpansee', kort: 'Chimp.', emoji: '🐵', categorie: 'zoogdier', beschrijving: 'De chimpansee lijkt het meest op mensen.', weetjes: ['Hij gebruikt takjes om mieren te vangen.', 'Chimpansees kunnen gereedschap maken.', 'Chimpansees knuffelen en lachen net als wij.', 'Ze eten graag fruit en noten.', 'Chimpansees wonen in het oerwoud.'] },
-  { id: 'koala', naam: 'Koala', emoji: '🐨', categorie: 'zoogdier', beschrijving: 'De koala woont in Australië.', weetjes: ['Hij eet bijna alleen eucalyptusblaadjes.', 'Hij slaapt wel achttien uur per dag.', "Baby koala's rijden mee op mama's rug.", 'Koala\'s klimmen heel goed in bomen.', 'Een koala heeft een heel zachte vacht.'] },
-  { id: 'nijlpaard', naam: 'Nijlpaard', emoji: '🦛', categorie: 'zoogdier', beschrijving: 'Het nijlpaard woont in Afrika.', weetjes: ['Hij kan heel goed zwemmen.', 'Zijn bek kan wijd open, dat is best eng!', 'Nijlpaarden blijven graag in het water.', 'Het nijlpaard is heel zwaar.', 'Ze eten vooral gras en planten.'] },
-  { id: 'zebra', naam: 'Zebra', emoji: '🦓', categorie: 'zoogdier', beschrijving: 'De zebra heeft zwart-witte strepen.', weetjes: ['Die strepen helpen tegen vliegen.', 'Elke zebra heeft unieke strepen.', 'Zebra\'s leven in grote kuddes.', 'Een leeuw vindt het lastig om één zebra te kiezen!', 'Zebra\'s rennen heel hard.'] },
-  { id: 'eekhoorn', naam: 'Eekhoorn', emoji: '🐿️', categorie: 'zoogdier', beschrijving: 'De eekhoorn woont in bomen.', weetjes: ['Hij verzamelt noten en verstop ze voor de winter.', 'Zijn pluimstaart helpt bij het springen.', 'Eekhoorns zijn heel druk en snel.', 'Ze vergeten waar ze noten hebben verstopt!', 'Eekhoorns eten graag eikels.'] },
-  { id: 'konijn', naam: 'Konijn', emoji: '🐰', categorie: 'zoogdier', beschrijving: 'Konijnen kunnen heel hoog springen.', weetjes: ['Ze hebben lange oren om goed te horen.', 'Wilde konijnen graven gangen, dat heet een burcht.', 'Konijnen eten graag worteltjes en groen.', 'Een konijn kan heel hard rennen.', 'Konijnen kunnen wel tien jaar oud worden.'] },
-  { id: 'egel', naam: 'Egel', emoji: '🦔', categorie: 'zoogdier', beschrijving: 'De egel heeft stekels op zijn rug.', weetjes: ['Als hij schrikt, rolt hij zich op tot een balletje.', 'Egels eten slakken en insecten.', 'In de winter doet een egel een winterslaap.', 'Egels zijn vooral \'s nachts wakker.', 'Een egel heeft wel duizenden stekels!'] },
-  // Vogels
-  { id: 'uil', naam: 'Uil', emoji: '🦉', categorie: 'vogel', beschrijving: 'Uilen jagen \'s nachts.', weetjes: ['Hun ogen kunnen in het donker goed zien.', 'Ze kunnen hun kop bijna helemaal omdraaien, wel 270 graden!', 'Uilen vliegen bijna geruisloos.', 'Er zijn wel 200 soorten uilen.', 'Een uil eet muizen en andere kleine dieren.'] },
-  { id: 'pauw', naam: 'Pauw', emoji: '🦚', categorie: 'vogel', beschrijving: 'De mannetjespauw heeft een prachtige staart.', weetjes: ['Hij spreidt zijn staart om indruk te maken.', 'Pauwen kunnen niet zo goed vliegen, maar wel mooi lopen.', 'De staart heeft mooie oogjes erop.', 'Pauwen eten zaden en insecten.', 'Alleen het mannetje heeft die mooie staart.'] },
-  { id: 'pinguin', naam: 'Pinguïn', emoji: '🐧', categorie: 'vogel', beschrijving: 'Pinguïns kunnen niet vliegen maar wel zwemmen.', weetjes: ['Ze leven op de Zuidpool.', 'Papa pinguïn houdt het ei warm op zijn voeten.', 'Pinguïns eten vis uit de zee.', 'Ze waggelen grappig over het ijs.', 'Pinguïns kunnen heel diep duiken.'] },
-  { id: 'flamingo', naam: 'Flamingo', emoji: '🦩', categorie: 'vogel', beschrijving: 'Flamingo\'s zijn roze door garnalen en algen.', weetjes: ['Ze staan vaak op één been.', 'In Nederland zie je ze soms bij zout water.', 'Een groep flamingo\'s heet een kolonie.', 'Flamingo\'s filteren eten uit het water.', 'Hun snavel is speciaal gevormd.'] },
-  { id: 'kolibrie', naam: 'Kolibrie', emoji: '🐦', categorie: 'vogel', beschrijving: 'De kolibrie beweegt zijn vleugels super snel.', weetjes: ['Hij kan stil in de lucht hangen.', 'Hij kan zelfs achteruit vliegen!', 'Hij drinkt nectar uit bloemen.', 'De kolibrie is een heel klein vogeltje.', 'Zijn vleugels zoemen als een bij.'] },
-  { id: 'specht', naam: 'Specht', emoji: '🐦', categorie: 'vogel', beschrijving: 'De specht tikt tegen bomen om insecten te vinden.', weetjes: ['Zijn kop is extra stevig, geen hoofdpijn!', 'Hij maakt een hol in de boom om te slapen.', 'Je hoort de specht vaak in het bos.', 'Spechten hebben een lange, sterke snavel.', 'Ze eten insecten onder de bast.'] },
-  // Reptielen
-  { id: 'krokodil', naam: 'Krokodil', emoji: '🐊', categorie: 'reptiel', beschrijving: 'De krokodil is een oud reptiel.', weetjes: ['Hij wacht in het water tot een dier komt drinken.', 'Zijn kaken zijn zo sterk dat hij bijna alles kan dichtbijten.', 'Krokodillen zijn al heel lang op aarde.', 'Ze kunnen heel lang onder water blijven.', 'Een krokodil eet vissen en soms grotere dieren.'] },
-  { id: 'slang', naam: 'Slang', emoji: '🐍', categorie: 'reptiel', beschrijving: 'Slangen hebben geen pootjes.', weetjes: ['Ze kronkelen voort over de grond.', 'Ze ruiken met hun tong!', 'Sommige slangen voelen trillingen met hun buik.', 'Slangen vervellen een paar keer per jaar.', 'Niet alle slangen zijn giftig.'] },
-  { id: 'schildpad', naam: 'Reuzenschildpad', kort: 'Schildpad', emoji: '🐢', categorie: 'reptiel', beschrijving: 'Reuzenschildpadden kunnen heel oud worden.', weetjes: ['Wel meer dan honderd jaar!', 'Ze dragen hun huis op hun rug.', 'Op de Galapagoseilanden leven echte reuzen.', 'Schildpadden eten planten en soms fruit.', 'Ze lopen heel langzaam.'] },
-  { id: 'kameleon', naam: 'Kameleon', emoji: '🦎', categorie: 'reptiel', beschrijving: 'De kameleon kan van kleur veranderen.', weetjes: ['Hij doet dat door zijn humeur of om zich te verstoppen.', 'Zijn tong schiet eruit om insecten te vangen.', 'Kameleons hebben ogen die alle kanten op kunnen.', 'Ze leven in bomen.', 'Een kameleon eet vooral insecten.'] },
-  // Insecten
-  { id: 'bij', naam: 'Honingbij', kort: 'Bij', emoji: '🐝', categorie: 'insect', beschrijving: 'Honingbijen maken honing van bloemnectar.', weetjes: ['Ze dansen om te vertellen waar bloemen zijn.', 'Zonder bijen hebben we bijna geen fruit en groente.', 'Een bijenkorf heeft één koningin.', 'Bijen maken honing van nectar.', 'Bijen kunnen steken als ze schrikken.'] },
-  { id: 'vlinder', naam: 'Vlinder', emoji: '🦋', categorie: 'insect', beschrijving: 'Vlinders beginnen als rups.', weetjes: ['De rups verpopt zich en wordt dan een vlinder.', 'Hun vleugels hebben duizenden schubjes.', 'Vlinders proeven met hun pootjes!', 'Er zijn wel 20.000 soorten vlinders.', 'Vlinders houden van bloemen.'] },
-  { id: 'mier', naam: 'Mier', emoji: '🐜', categorie: 'insect', beschrijving: 'Mieren zijn super sterk.', weetjes: ['Ze tillen dingen die veel zwaarder zijn dan zijzelf.', 'Ze leven in een nest met een koningin.', 'Mieren werken allemaal samen.', 'Mieren praten met geurtjes.', 'Er zijn heel veel mieren op de wereld.'] },
-  { id: 'libel', naam: 'Libel', emoji: '🪲', categorie: 'insect', beschrijving: 'Libellen kunnen heel snel vliegen.', weetjes: ['Ze kunnen alle kanten op vliegen.', 'Ze hebben grote ogen en vangen insecten in de lucht.', 'Libellen leven graag bij water.', 'Libellen bestonden al in de tijd van de dinosaurussen!', 'Een libel heeft vier vleugels.'] },
-  // Water
-  { id: 'haai', naam: 'Haaai', emoji: '🦈', categorie: 'water', beschrijving: 'Haaien zijn vissen met een skelet van kraakbeen.', weetjes: ['Ze ruiken bloed van ver.', 'De witte haai is een van de grootste roofvissen.', 'Niet alle haaien zijn gevaarlijk.', 'Haaien zwemmen al miljoenen jaren in de zee.', 'Haaien hebben heel veel tanden.'] },
-  { id: 'octopus', naam: 'Octopus', emoji: '🐙', categorie: 'water', beschrijving: 'De octopus heeft acht armen met zuignappen.', weetjes: ['Hij kan van kleur en vorm veranderen.', 'Hij is heel slim en kan potjes openmaken.', 'Een octopus verstopt zich graag.', 'Octopussen spuiten inkt als ze schrikken.', 'Ze eten krabben en andere zeedieren.'] },
-  { id: 'zeehond', naam: 'Zeehond', emoji: '🦭', categorie: 'water', beschrijving: 'Zeehonden leven in zee.', weetjes: ['Ze komen op het strand om te rusten.', 'In Nederland zie je ze in de Waddenzee.', 'Ze eten vis en kunnen heel diep duiken.', 'Zeehonden hebben snorharen om vis te vinden.', 'Ze kunnen goed zwemmen en duiken.'] },
-  { id: 'walvis', naam: 'Blauwe vinvis', kort: 'Vinvis', emoji: '🐋', categorie: 'water', beschrijving: 'De blauwe vinvis is het grootste dier ooit.', weetjes: ['Hij is groter dan een dinosaurus.', 'Zijn hart is zo groot als een kleine auto.', 'Blauwe vinvissen eten kleine garnaaltjes.', 'Ze zwemmen in alle oceanen.', 'Ze zingen onder water.'] },
-  { id: 'zeearend', naam: 'Zeearend', emoji: '🦅', categorie: 'vogel', beschrijving: 'De zeearend is een grote roofvogel.', weetjes: ['Hij leeft bij meren en de zee en eet vis.', 'In Nederland broedt hij in de Oostvaardersplassen.', 'Zeearenden hebben een witte staart.', 'Ze hebben enorme klauwen.', 'De zeearend is een beschermde vogel.'] },
-  // Overig / extra
-  { id: 'neushoorn', naam: 'Neushoorn', kort: 'Neush.', emoji: '🦏', categorie: 'zoogdier', beschrijving: 'De neushoorn heeft een hoorn op zijn neus.', weetjes: ['Die hoorn is van hetzelfde spul als onze nagels.', 'Er zijn vijf soorten neushoorns.', 'Sommige neushoorns zijn heel zeldzaam.', 'Neushoorns leven in Afrika en Azië.', 'Ze eten vooral gras en bladeren.'] },
-  { id: 'kangoeroe', naam: 'Kangoeroe', kort: 'Kangoer.', emoji: '🦘', categorie: 'zoogdier', beschrijving: 'De kangoeroe springt op zijn sterke achterpoten.', weetjes: ["Het jong zit in de buidel van mama.", "Kangoeroes komen uit Australië.", "Ze kunnen heel ver springen.", "Kangoeroes eten gras en planten.", "De staart helpt bij het evenwicht."] },
-  { id: 'luiaard', naam: 'Luiaard', emoji: '🦥', categorie: 'zoogdier', beschrijving: 'De luiaard beweegt heel langzaam.', weetjes: ['Hij hangt ondersteboven in bomen.', 'Hij slaapt wel vijftien uur per dag.', 'In zijn vacht groeien soms groene algen.', 'Luiaards eten blaadjes.', 'Ze komen uit Zuid-Amerika.'] },
+export interface LeerDier extends LeerDierBase {
+  naam: string
+  kort?: string
+  beschrijving: string
+  weetjes: [string, string, string, string, string]
+}
+
+/** Lijst dieren (id, emoji, categorie). Tekst komt uit LEER_CONTENT[locale]. */
+export const LEER_DIEREN: LeerDierBase[] = [
+  { id: 'leeuw', emoji: '🦁', categorie: 'zoogdier' },
+  { id: 'olifant', emoji: '🐘', categorie: 'zoogdier' },
+  { id: 'giraffe', emoji: '🦒', categorie: 'zoogdier' },
+  { id: 'panda', emoji: '🐼', categorie: 'zoogdier' },
+  { id: 'dolfijn', emoji: '🐬', categorie: 'zoogdier' },
+  { id: 'tijger', emoji: '🐯', categorie: 'zoogdier' },
+  { id: 'wolf', emoji: '🐺', categorie: 'zoogdier' },
+  { id: 'aap', emoji: '🐵', categorie: 'zoogdier' },
+  { id: 'koala', emoji: '🐨', categorie: 'zoogdier' },
+  { id: 'nijlpaard', emoji: '🦛', categorie: 'zoogdier' },
+  { id: 'zebra', emoji: '🦓', categorie: 'zoogdier' },
+  { id: 'eekhoorn', emoji: '🐿️', categorie: 'zoogdier' },
+  { id: 'konijn', emoji: '🐰', categorie: 'zoogdier' },
+  { id: 'egel', emoji: '🦔', categorie: 'zoogdier' },
+  { id: 'uil', emoji: '🦉', categorie: 'vogel' },
+  { id: 'pauw', emoji: '🦚', categorie: 'vogel' },
+  { id: 'pinguin', emoji: '🐧', categorie: 'vogel' },
+  { id: 'flamingo', emoji: '🦩', categorie: 'vogel' },
+  { id: 'kolibrie', emoji: '🐦', categorie: 'vogel' },
+  { id: 'specht', emoji: '🐦', categorie: 'vogel' },
+  { id: 'krokodil', emoji: '🐊', categorie: 'reptiel' },
+  { id: 'slang', emoji: '🐍', categorie: 'reptiel' },
+  { id: 'schildpad', emoji: '🐢', categorie: 'reptiel' },
+  { id: 'kameleon', emoji: '🦎', categorie: 'reptiel' },
+  { id: 'bij', emoji: '🐝', categorie: 'insect' },
+  { id: 'vlinder', emoji: '🦋', categorie: 'insect' },
+  { id: 'mier', emoji: '🐜', categorie: 'insect' },
+  { id: 'libel', emoji: '🪲', categorie: 'insect' },
+  { id: 'haai', emoji: '🦈', categorie: 'water' },
+  { id: 'octopus', emoji: '🐙', categorie: 'water' },
+  { id: 'zeehond', emoji: '🦭', categorie: 'water' },
+  { id: 'walvis', emoji: '🐋', categorie: 'water' },
+  { id: 'zeearend', emoji: '🦅', categorie: 'vogel' },
+  { id: 'neushoorn', emoji: '🦏', categorie: 'zoogdier' },
+  { id: 'kangoeroe', emoji: '🦘', categorie: 'zoogdier' },
+  { id: 'luiaard', emoji: '🦥', categorie: 'zoogdier' },
+  { id: 'trex', emoji: '🦖', categorie: 'dinosaurus' },
+  { id: 'triceratops', emoji: '🦕', categorie: 'dinosaurus' },
+  { id: 'brachiosaurus', emoji: '🦕', categorie: 'dinosaurus' },
+  { id: 'stegosaurus', emoji: '🦕', categorie: 'dinosaurus' },
+  { id: 'pteranodon', emoji: '🦅', categorie: 'dinosaurus' },
+  { id: 'velociraptor', emoji: '🦖', categorie: 'dinosaurus' },
+  { id: 'draak', emoji: '🐉', categorie: 'fantasie' },
+  { id: 'eenhoorn', emoji: '🦄', categorie: 'fantasie' },
+  { id: 'feniks', emoji: '🔥', categorie: 'fantasie' },
 ]
+
+export function getLeerDierenWithLocale(locale: Locale): LeerDier[] {
+  const content = LEER_CONTENT[locale] ?? LEER_CONTENT.nl
+  return LEER_DIEREN.map((base) => {
+    const c = content[base.id] ?? (LEER_CONTENT.nl[base.id] as (typeof content)[string])
+    if (!c) return null
+    return { ...base, ...c } as LeerDier
+  }).filter(Boolean) as LeerDier[]
+}

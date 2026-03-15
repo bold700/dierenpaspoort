@@ -1,9 +1,11 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAppStore } from '../store/useAppStore'
 import { useSettingsStore } from '../store/useSettingsStore'
+import { useTranslations } from '../i18n/useTranslations'
 import { NesIcon } from './NesIcon'
 
 export function Header() {
+  const { t } = useTranslations()
   const location = useLocation()
   const isSettings = location.pathname === '/settings'
   const profileIcon = useSettingsStore((s) => s.profileIcon)
@@ -17,7 +19,7 @@ export function Header() {
   return (
     <header className="mb-4 w-full">
       <div className="nes-container is-rounded with-title is-dark w-full">
-        <p className="title">Dierenpaspoort</p>
+        <p className="title">{t('headerTitle')}</p>
 
         <div className="flex items-center justify-between gap-3 pt-1">
           <Link to="/" className="flex items-center gap-3 min-w-0">
@@ -25,16 +27,16 @@ export function Header() {
               <NesIcon name={profileIcon} />
             </span>
             <div className="min-w-0">
-              <div className="nes-text is-primary font-bold leading-tight">Level {level}</div>
-              <div className="nes-text is-disabled text-xs leading-tight mt-0.5">Ontdekker</div>
+              <div className="nes-text is-primary font-bold leading-tight">{t('headerLevel')} {level}</div>
+              <div className="nes-text is-disabled text-xs leading-tight mt-0.5">{t('headerDiscoverer')}</div>
             </div>
           </Link>
           {isSettings ? (
-            <Link to="/" className="nes-btn shrink-0" aria-label="Sluiten">
+            <Link to="/" className="nes-btn shrink-0" aria-label={t('headerClose')}>
               <NesIcon name="times" />
             </Link>
           ) : (
-            <Link to="/settings" className="nes-btn shrink-0" aria-label="Instellingen">
+            <Link to="/settings" className="nes-btn shrink-0" aria-label={t('headerSettings')}>
               <NesIcon name="cog" />
             </Link>
           )}

@@ -1,18 +1,24 @@
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSettingsStore } from '../store/useSettingsStore'
 import { useAppStore } from '../store/useAppStore'
 import { useSpeak } from '../hooks/useSpeak'
+import { useTranslations } from '../i18n/useTranslations'
 import { useAnimalScan } from '../hooks/useAnimalScan'
 import { ResultCard } from './ResultCard'
 import { NesIcon } from './NesIcon'
 import type { AnimalResult } from '../types'
 
 export function ScanPanel() {
+  const { t } = useTranslations()
   const navigate = useNavigate()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const streamRef = useRef<MediaStream | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [result, setResult] = useState<{ animal: AnimalResult; xpGained: number; isNew: boolean } | null>(null)
+  const [cameraActive, setCameraActive] = useState(false)
+  const [cameraError, setCameraError] = useState<string | null>(null)
 
   const hasApiKey = useSettingsStore((s) => s.hasApiKey())
   const addSeenAnimal = useAppStore((s) => s.addSeenAnimal)
@@ -30,31 +36,31 @@ export function ScanPanel() {
     }
   }, [])
 
-  const handleFile = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0]
-      if (!file) return
-      const base64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = () => {
-          const data = (reader.result as string).split(',')[1]
-          resolve(data ?? '')
-        }
-        reader.onerror = reject
-        reader.readAsDataURL(file)
-      })
-      const mediaType = file.type || 'image/jpeg'
-      setPreviewUrl(URL.createObjectURL(file))
+  const stopCamera = useCallback(() => {
+    streamRef.current?.getTracks().forEach((track) => track.stop())
+    streamRef.current = null
+    setCameraActive(false)
+    setCameraError(null)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      stopCamera()
+    }
+  }, [stopCamera])
+
+  const runScan = useCallback(
+    async (base64: string, mediaType: string) => {
       setResult(null)
+      setPreviewUrl(`data:${mediaType};base64,${base64}`)
 
       const animal = await scan(base64, mediaType)
       setPreviewUrl(null)
 
       if (!animal) {
-        if (error) showToast(`Fout: ${error}`)
-        else speak('Geen dier gevonden. Probeer een andere foto!')
-        showToast('Geen dier herkend')
-        e.target.value = ''
+        if (error) showToast(t('scanError', { error }))
+        else speak(t('scanNoAnimal'))
+        showToast(t('scanNoAnimal'))
         return
       }
 
@@ -72,51 +78,110 @@ export function ScanPanel() {
       const levelAfter = useAppStore.getState().level
       if (levelAfter > levelBefore) {
         setTimeout(() => {
-          speak(`Wauw! Level ${levelAfter} bereikt!`)
-          showToast(`Level ${levelAfter}!`)
+          speak(t('scanLevelReached', { n: levelAfter }))
+          showToast(t('scanLevelToast', { n: levelAfter }))
         }, 800)
       }
       setResult({ animal, xpGained, isNew })
 
       const newlyUnlocked = checkAchievements()
       if (newlyUnlocked.length) {
+        const badgeName = t(`achievement_${newlyUnlocked[0]}_name`)
         setTimeout(() => {
-          speak(`Gefeliciteerd! Badge behaald: ${newlyUnlocked[0]}`)
-          showToast(`${newlyUnlocked[0]}!`)
+          speak(t('scanBadgeUnlocked', { name: badgeName }))
+          showToast(`${badgeName}!`)
         }, 1200)
       }
-
-      e.target.value = ''
     },
-    [scan, error, speak, showToast, addSeenAnimal, checkAchievements]
+    [scan, error, speak, showToast, addSeenAnimal, checkAchievements, t]
   )
+
+  const handleFile = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      if (!file) return
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => {
+          const data = (reader.result as string).split(',')[1]
+          resolve(data ?? '')
+        }
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+      const mediaType = file.type || 'image/jpeg'
+      e.target.value = ''
+      await runScan(base64, mediaType)
+    },
+    [runScan]
+  )
+
+  const startCamera = useCallback(async () => {
+    setCameraError(null)
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true })
+      streamRef.current = stream
+      setCameraActive(true)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : t('scanCameraDenied')
+      setCameraError(msg)
+    }
+  }, [t])
+
+  // Koppel stream aan video zodra het element in de DOM staat (na setCameraActive(true))
+  useEffect(() => {
+    if (!cameraActive || !streamRef.current || !videoRef.current) return
+    const video = videoRef.current
+    video.srcObject = streamRef.current
+    video.play().catch(() => {})
+  }, [cameraActive])
+
+  const capturePhoto = useCallback(() => {
+    const video = videoRef.current
+    if (!video || !streamRef.current || !video.videoWidth) return
+    const canvas = document.createElement('canvas')
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    ctx.drawImage(video, 0, 0)
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.9)
+    const base64 = dataUrl.split(',')[1] ?? ''
+    stopCamera()
+    runScan(base64, 'image/jpeg')
+  }, [stopCamera, runScan])
 
   const speakIntro = useCallback(() => {
     if (!result) return
     const a = result.animal
-    const t = a.type
-    if (t === 'dinosaurus') speak(`${a.naam}! Een dino!`)
-    else if (t === 'fantasie') speak(`${a.naam}! Een fantasiedier!`)
-    else if (t === 'plaatje') speak(`Een plaatje van een ${a.naam.toLowerCase()}!`)
-    else if (t === 'speelgoed') speak(`Speelgoed: een ${a.naam.toLowerCase()}!`)
+    const type = a.type
+    if (type === 'dinosaurus') speak(`${a.naam}! ${t('speakIntroDino')}`)
+    else if (type === 'fantasie') speak(`${a.naam}! ${t('speakIntroFantasie')}`)
+    else if (type === 'plaatje') speak(t('speakIntroPlaatje', { name: a.naam }))
+    else if (type === 'speelgoed') speak(t('speakIntroSpeelgoed', { name: a.naam }))
     else speak(`${a.naam}!`)
-  }, [result, speak])
+  }, [result, speak, t])
 
   const speakAll = useCallback(() => {
     if (!result) return
     const a = result.animal
-    const dierwoord = a.type === 'dinosaurus' ? 'dino' : a.type === 'fantasie' ? 'fantasiedier' : 'dier'
+    const typeKey = a.type === 'dinosaurus' ? 'speakTypeDino' : a.type === 'fantasie' ? 'speakTypeFantasie' : 'speakTypeDier'
+    const rarityKey =
+      (a.zeldzaamheid ?? '').toLowerCase().includes('super') ? 'raritySuperschaars'
+      : (a.zeldzaamheid ?? '').toLowerCase().includes('zeldzaam') ? 'rarityZeldzaam'
+      : (a.zeldzaamheid ?? '').toLowerCase().includes('bijzonder') ? 'rarityBijzonder'
+      : 'rarityGewoon'
     speak(
-      `${a.naam}! ${a.zeldzaamheid} ${dierwoord}. ${a.vergelijking_gewicht}. ${a.vergelijking_snelheid}. ${a.weetjes?.[0] ?? ''}`
+      `${a.naam}! ${t(rarityKey)} ${t(typeKey)}. ${a.vergelijking_gewicht}. ${a.vergelijking_snelheid}. ${a.weetjes?.[0] ?? ''}`
     )
-  }, [result, speak])
+  }, [result, speak, t])
 
   if (!hasApiKey) {
     return (
       <div className="nes-container is-rounded is-dark text-center py-6">
-        <p className="nes-text is-warning mb-4">Voeg eerst een API-sleutel toe in de instellingen.</p>
+        <p className="nes-text is-warning mb-4">{t('scanNoApiKey')}</p>
         <button type="button" onClick={() => navigate('/settings')} className="nes-btn is-primary">
-          Naar instellingen
+          {t('scanGoToSettings')}
         </button>
       </div>
     )
@@ -124,13 +189,7 @@ export function ScanPanel() {
 
   return (
     <div>
-      <div
-        className="nes-container is-rounded py-6 px-4 cursor-pointer select-none"
-        onClick={() => fileInputRef.current?.click()}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
-      >
+      <div className="nes-container is-rounded py-6 px-4 select-none">
         <input
           ref={fileInputRef}
           type="file"
@@ -139,23 +198,56 @@ export function ScanPanel() {
           className="hidden"
           onChange={handleFile}
         />
-        {!loading ? (
+        {cameraActive && !loading ? (
+          <div className="text-center">
+            <div className="relative w-full max-h-64 bg-black rounded-lg overflow-hidden mb-4">
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full h-full object-cover"
+              />
+            </div>
+            {cameraError && (
+              <p className="nes-text is-error text-xs mb-2">{cameraError}</p>
+            )}
+            <div className="flex flex-col sm:flex-row gap-2 justify-center">
+              <button
+                type="button"
+                className="nes-btn is-primary"
+                onClick={capturePhoto}
+              >
+                <NesIcon name="search" className="mr-1 shrink-0" /> {t('scanTakePhoto')}
+              </button>
+              <button type="button" className="nes-btn" onClick={stopCamera}>
+                {t('scanCancel')}
+              </button>
+            </div>
+          </div>
+        ) : !loading ? (
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-20 h-20 nes-container is-rounded mb-4">
               <NesIcon name="search" size="4x" />
             </div>
-            <p className="nes-text is-primary text-lg font-bold mb-1">Maak een foto van een dier</p>
-            <p className="nes-text is-disabled text-sm mb-4">Echt dier, plaatje, speelgoed of dino — alles telt!</p>
-            <button
-              type="button"
-              className="nes-btn is-primary"
-              onClick={(e) => {
-                e.stopPropagation()
-                fileInputRef.current?.click()
-              }}
-            >
-              Foto kiezen
-            </button>
+            <p className="nes-text is-primary text-lg font-bold mb-1">{t('scanTitle')}</p>
+            <p className="nes-text is-disabled text-sm mb-4">{t('scanSubtitle')}</p>
+            <div className="flex flex-col sm:flex-row gap-2 justify-center">
+              <button
+                type="button"
+                className="nes-btn is-primary"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {t('scanChoosePhoto')}
+              </button>
+              <button
+                type="button"
+                className="nes-btn"
+                onClick={startCamera}
+              >
+                <NesIcon name="cog" className="mr-1 shrink-0" /> {t('scanUseCamera')}
+              </button>
+            </div>
           </div>
         ) : (
           <div className="text-center">
@@ -166,7 +258,7 @@ export function ScanPanel() {
                 className="w-full max-h-48 object-cover mb-4 nes-container is-rounded"
               />
             )}
-            <p className="nes-text is-primary mb-2">AI herkent het dier...</p>
+            <p className="nes-text is-primary mb-2">{t('scanRecognizing')}</p>
             <progress className="nes-progress is-primary" value={70} max={100} />
           </div>
         )}

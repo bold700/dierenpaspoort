@@ -88,7 +88,7 @@ export const useAppStore = create<AppState & {
     const newlyUnlocked: string[] = []
     ACHIEVEMENTS.forEach((ach) => {
       if (!state.unlockedAchievements.includes(ach.id) && ach.req(state)) {
-        newlyUnlocked.push(ach.name)
+        newlyUnlocked.push(ach.id)
         set({
           unlockedAchievements: [...state.unlockedAchievements, ach.id]
         })

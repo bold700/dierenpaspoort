@@ -1,4 +1,13 @@
 import type { VoiceOption } from './types'
+import type { Locale } from './i18n/translations'
+
+const AI_LANGUAGE_NAMES: Record<Locale, string> = {
+  nl: 'Dutch',
+  en: 'English',
+  es: 'Spanish',
+  zh: 'Chinese',
+  fr: 'French',
+}
 
 export const VOICES: VoiceOption[] = [
   { id: 'cgSgspJ2msm6clMCkdW9', name: 'Jessica', desc: 'Warm, vriendelijk' },
@@ -21,3 +30,11 @@ Standaard JSON (altijd alle velden vullen):
 {"naam":"Nederlandse naam","emoji":"één emoji","type":"echt|plaatje|speelgoed|dinosaurus|fantasie","zeldzaamheid":"Gewoon / Bijzonder / Zeldzaam / Superschaars","gewicht":"bijv. 300 kg","lengte":"bijv. 3 meter","leeftijd":"bijv. 15 jaar","vergelijking_gewicht":"vergelijking voor kind van 6","vergelijking_snelheid":"vergelijking voor kind van 6","vergelijking_lengte":"vergelijking voor kind van 6","weetjes":["kort grappig weetje","kort verbazingwekkend weetje","kort weetje"],"xp":25,"gevonden":true}
 
 Alleen als er echt geen dier, plaatje, speelgoed of fantasiedier herkenbaar is: {"gevonden":false}`
+
+/** Prompt met taalinstructie: alle tekst in de gekozen taal. */
+export function getAIPromptForLocale(locale: Locale): string {
+  const lang = AI_LANGUAGE_NAMES[locale]
+  return `${AI_PROMPT}
+
+IMPORTANT: Return ALL text in ${lang}. Every JSON string field must be in ${lang} only: naam, zeldzaamheid, gewicht, lengte, leeftijd, vergelijking_gewicht, vergelijking_snelheid, vergelijking_lengte, and each item in weetjes. Use ${lang} for units and comparisons (e.g. "kg", "meters" or "m", "years" or local equivalent). Keep the JSON structure and keys unchanged.`
+}

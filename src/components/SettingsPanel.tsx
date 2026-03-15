@@ -3,11 +3,16 @@ import { useNavigate } from 'react-router-dom'
 import { useSettingsStore } from '../store/useSettingsStore'
 import { useAppStore } from '../store/useAppStore'
 import { useSpeak } from '../hooks/useSpeak'
+import { useTranslations } from '../i18n/useTranslations'
+import { LOCALE_NAMES, type Locale } from '../i18n/translations'
 import { VOICES } from '../constants'
 import { ALL_ICON_IDS } from '../assets/nes-icons'
 import { NesIcon } from './NesIcon'
 
+const LOCALES: Locale[] = ['nl', 'en', 'es', 'zh', 'fr']
+
 export function SettingsPanel() {
+  const { t } = useTranslations()
   const navigate = useNavigate()
   const [apiKeyInput, setApiKeyInput] = useState('')
   const [elKeyInput, setElKeyInput] = useState('')
@@ -15,6 +20,8 @@ export function SettingsPanel() {
   const [showElKey, setShowElKey] = useState(false)
 
   const {
+    locale,
+    setLocale,
     provider,
     apiKey,
     tts,
@@ -45,38 +52,38 @@ export function SettingsPanel() {
   const handleSaveKey = () => {
     const v = apiKeyInput.trim()
     if (!v) {
-      showToast('Vul eerst een sleutel in')
+      showToast(t('toastFillKey'))
       return
     }
     setApiKey(v)
     setApiKeyInput('')
-    showToast('AI-sleutel opgeslagen')
+    showToast(t('toastKeySaved'))
   }
 
   const handleSaveElevenLabs = () => {
     const v = elKeyInput.trim()
     if (!v) {
-      showToast('Vul eerst je ElevenLabs key in')
+      showToast(t('toastFillElKey'))
       return
     }
     setElKey(v)
     setElKeyInput('')
     setTTS('elevenlabs')
-    showToast('ElevenLabs opgeslagen – voorlezen gebruikt nu ElevenLabs')
+    showToast(t('toastElSaved'))
   }
 
   const handleTestElevenLabs = async () => {
     if (!hasElKey()) {
-      showToast('Sla eerst je ElevenLabs key op')
+      showToast(t('toastSaveElFirst'))
       return
     }
     await speakElevenLabs('Wauw! Je hebt een tijger gevonden! Dat is een zeldzaam dier!')
   }
 
   const handleReset = () => {
-    if (!window.confirm('Weet je zeker? Alle voortgang wordt gewist.')) return
+    if (!window.confirm(t('confirmReset'))) return
     resetAll()
-    showToast('Collectie gereset')
+    showToast(t('toastResetDone'))
     navigate('/')
   }
 
@@ -85,7 +92,23 @@ export function SettingsPanel() {
   return (
     <div className="space-y-4 pb-8">
       <div className="nes-container is-rounded is-dark">
-        <p className="nes-text is-primary text-xs font-bold mb-3">Profielicoon</p>
+        <p className="nes-text is-primary text-xs font-bold mb-2">{t('settingsLanguage')}</p>
+        <div className="flex flex-wrap gap-2 mb-4">
+          {LOCALES.map((loc) => (
+            <button
+              key={loc}
+              type="button"
+              onClick={() => setLocale(loc)}
+              className={`nes-btn text-sm ${locale === loc ? 'is-primary' : ''}`}
+            >
+              {LOCALE_NAMES[loc]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="nes-container is-rounded is-dark">
+        <p className="nes-text is-primary text-xs font-bold mb-3">{t('settingsProfileIcon')}</p>
         <div className="flex flex-wrap gap-2">
           {ALL_ICON_IDS.map((id) => (
             <button
@@ -104,61 +127,61 @@ export function SettingsPanel() {
       </div>
 
       <div className="nes-container is-rounded is-dark">
-        <p className="nes-text is-primary text-xs font-bold mb-2">AI-provider</p>
-        <div className="flex flex-nowrap gap-2 mb-4 min-w-0">
+        <p className="nes-text is-primary text-xs font-bold mb-2">{t('settingsAiProvider')}</p>
+        <div className="flex flex-col gap-2 mb-4">
           <button
             type="button"
             onClick={() => setProvider('anthropic')}
-            className={`nes-btn flex-1 min-w-0 text-xs sm:text-base ${provider === 'anthropic' ? 'is-primary' : ''}`}
+            className={`nes-btn w-full text-xs sm:text-base ${provider === 'anthropic' ? 'is-primary' : ''}`}
           >
             Anthropic
           </button>
           <button
             type="button"
             onClick={() => setProvider('openai')}
-            className={`nes-btn flex-1 min-w-0 text-xs sm:text-base ${provider === 'openai' ? 'is-primary' : ''}`}
+            className={`nes-btn w-full text-xs sm:text-base ${provider === 'openai' ? 'is-primary' : ''}`}
           >
             OpenAI
           </button>
         </div>
-        <p className="nes-text is-primary text-xs font-bold mb-2">API-sleutel</p>
+        <p className="nes-text is-primary text-xs font-bold mb-2">{t('settingsApiKey')}</p>
         <div className="relative mb-2">
           <input
             type={showKey ? 'text' : 'password'}
             value={apiKeyInput}
             onChange={(e) => setApiKeyInput(e.target.value)}
-            placeholder={apiKey ? 'Nieuwe sleutel...' : 'Plak je API-sleutel...'}
+            placeholder={apiKey ? t('settingsPlaceholderNewKey') : t('settingsPlaceholderKey')}
             className="nes-input is-dark w-full"
           />
           <button
             type="button"
             onClick={() => setShowKey(!showKey)}
             className="absolute right-2 top-1/2 -translate-y-1/2"
-            aria-label={showKey ? 'Verberg' : 'Toon'}
+            aria-label={showKey ? t('settingsHide') : t('settingsShow')}
           >
             <NesIcon name={showKey ? 'eye-slash' : 'eye'} />
           </button>
         </div>
-        <p className={`text-xs mt-1 ${apiKey ? 'nes-text is-success' : 'nes-text is-disabled'}`}>{apiKey ? keyMask(apiKey) : 'Geen sleutel'}</p>
+        <p className={`text-xs mt-1 ${apiKey ? 'nes-text is-success' : 'nes-text is-disabled'}`}>{apiKey ? keyMask(apiKey) : t('settingsNoKey')}</p>
         <button type="button" onClick={handleSaveKey} className="nes-btn is-primary w-full mt-3">
-          Opslaan
+          {t('settingsSave')}
         </button>
       </div>
 
       <div className="nes-container is-rounded is-dark">
-        <p className="nes-text is-primary text-xs font-bold mb-2">Stem (voorlezen)</p>
-        <div className="flex flex-nowrap gap-2 mb-4 min-w-0">
+        <p className="nes-text is-primary text-xs font-bold mb-2">{t('settingsVoice')}</p>
+        <div className="flex flex-col gap-2 mb-4">
           <button
             type="button"
             onClick={() => setTTS('browser')}
-            className={`nes-btn flex-1 min-w-0 text-xs sm:text-base whitespace-nowrap ${tts === 'browser' ? 'is-primary' : ''}`}
+            className={`nes-btn w-full text-xs sm:text-base whitespace-nowrap ${tts === 'browser' ? 'is-primary' : ''}`}
           >
             <NesIcon name="cog" className="mr-1 shrink-0" /> Browser
           </button>
           <button
             type="button"
             onClick={() => setTTS('elevenlabs')}
-            className={`nes-btn flex-1 min-w-0 text-xs sm:text-base whitespace-nowrap ${tts === 'elevenlabs' ? 'is-primary' : ''}`}
+            className={`nes-btn w-full text-xs sm:text-base whitespace-nowrap ${tts === 'elevenlabs' ? 'is-primary' : ''}`}
           >
             <NesIcon name="star" className="mr-1 shrink-0" /> ElevenLabs
           </button>
@@ -166,26 +189,26 @@ export function SettingsPanel() {
 
         {tts === 'elevenlabs' && (
           <div className="mt-3">
-            <p className="nes-text is-primary text-xs font-bold mb-2">ElevenLabs API-sleutel</p>
+            <p className="nes-text is-primary text-xs font-bold mb-2">{t('settingsElKey')}</p>
             <div className="relative mb-2">
               <input
                 type={showElKey ? 'text' : 'password'}
                 value={elKeyInput}
                 onChange={(e) => setElKeyInput(e.target.value)}
-                placeholder={elKey ? 'Nieuwe sleutel...' : 'Plak je key...'}
+                placeholder={elKey ? t('settingsPlaceholderNewKey') : t('settingsPlaceholderElKey')}
                 className="nes-input is-dark w-full"
               />
               <button
                 type="button"
                 onClick={() => setShowElKey(!showElKey)}
                 className="absolute right-2 top-1/2 -translate-y-1/2"
-                aria-label={showElKey ? 'Verberg' : 'Toon'}
+                aria-label={showElKey ? t('settingsHide') : t('settingsShow')}
               >
                 <NesIcon name={showElKey ? 'eye-slash' : 'eye'} />
               </button>
             </div>
-            <p className={`text-xs mt-1 ${elKey ? 'nes-text is-success' : 'nes-text is-disabled'}`}>{elKey ? keyMask(elKey) : 'Geen sleutel'}</p>
-            <p className="nes-text is-primary text-xs font-bold mt-3 mb-2">Kies een stem</p>
+            <p className={`text-xs mt-1 ${elKey ? 'nes-text is-success' : 'nes-text is-disabled'}`}>{elKey ? keyMask(elKey) : t('settingsNoKey')}</p>
+            <p className="nes-text is-primary text-xs font-bold mt-3 mb-2">{t('settingsChooseVoice')}</p>
             <div className="grid grid-cols-2 gap-2">
               {VOICES.map((v) => (
                 <button
@@ -200,18 +223,18 @@ export function SettingsPanel() {
               ))}
             </div>
             <button type="button" onClick={handleTestElevenLabs} className="nes-btn mt-3 w-full">
-              <NesIcon name="play" className="mr-1" /> Test stem
+              <NesIcon name="play" className="mr-1" /> {t('settingsTestVoice')}
             </button>
             <button type="button" onClick={handleSaveElevenLabs} className="nes-btn is-primary w-full mt-2">
-              Opslaan
+              {t('settingsSave')}
             </button>
           </div>
         )}
       </div>
 
       <div className="nes-container is-rounded is-dark">
-        <p className="nes-text is-primary text-xs font-bold mb-2">Info</p>
-        <p className="nes-text is-disabled text-sm">Sleutels worden alleen lokaal opgeslagen. Nooit gedeeld.</p>
+        <p className="nes-text is-primary text-xs font-bold mb-2">{t('settingsInfo')}</p>
+        <p className="nes-text is-disabled text-sm">{t('settingsInfoText')}</p>
         <hr className="my-3 border-[#4a4f57]" />
         <p className="nes-text is-disabled text-xs">
           Mogelijk gemaakt door{' '}
@@ -227,9 +250,9 @@ export function SettingsPanel() {
       </div>
 
       <div className="nes-container is-rounded is-dark">
-        <p className="nes-text is-error text-xs font-bold mb-2">Gevaarlijke zone</p>
+        <p className="nes-text is-error text-xs font-bold mb-2">{t('settingsDangerZone')}</p>
         <button type="button" onClick={handleReset} className="nes-btn is-error w-full">
-          <NesIcon name="times" className="mr-1" /> Reset collectie & XP
+          <NesIcon name="times" className="mr-1" /> {t('settingsReset')}
         </button>
       </div>
     </div>

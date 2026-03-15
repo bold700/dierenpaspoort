@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { useSettingsStore } from '../store/useSettingsStore'
-import { AI_PROMPT } from '../constants'
+import { getAIPromptForLocale } from '../constants'
 import type { ScanResponse, AnimalResult } from '../types'
 import { isAnimalResult } from '../types'
 
@@ -12,7 +12,8 @@ function parseResponse(text: string): ScanResponse {
 export function useAnimalScan() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const { provider, apiKey } = useSettingsStore()
+  const { provider, apiKey, locale } = useSettingsStore()
+  const prompt = getAIPromptForLocale(locale)
 
   const scan = useCallback(
     async (base64: string, mediaType: string): Promise<AnimalResult | null> => {
@@ -38,7 +39,7 @@ export function useAnimalScan() {
                       type: 'image_url',
                       image_url: { url: `data:${mediaType};base64,${base64}` }
                     },
-                    { type: 'text', text: AI_PROMPT }
+                    { type: 'text', text: prompt }
                   ]
                 }
               ]
@@ -70,7 +71,7 @@ export function useAnimalScan() {
                         data: base64
                       }
                     },
-                    { type: 'text', text: AI_PROMPT }
+                    { type: 'text', text: prompt }
                   ]
                 }
               ]
@@ -91,7 +92,7 @@ export function useAnimalScan() {
         setLoading(false)
       }
     },
-    [provider, apiKey]
+    [provider, apiKey, prompt]
   )
 
   return { scan, loading, error }

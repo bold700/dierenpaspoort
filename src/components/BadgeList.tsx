@@ -1,16 +1,20 @@
 import { useAppStore } from '../store/useAppStore'
+import { useTranslations } from '../i18n/useTranslations'
 import { NesIcon, type NesIconName } from './NesIcon'
 
 export function BadgeList() {
+  const { t } = useTranslations()
   const { achievements, unlockedAchievements, getProgress } = useAppStore()
 
   return (
     <div>
-      <p className="nes-text is-primary text-sm font-bold mb-3">Jouw badges</p>
+      <p className="nes-text is-primary text-sm font-bold mb-3">{t('badgesTitle')}</p>
       <div className="space-y-2">
         {achievements.map((ach) => {
           const unlocked = unlockedAchievements.includes(ach.id)
           const progress = getProgress(ach.id)
+          const nameKey = `achievement_${ach.id}_name` as const
+          const descKey = `achievement_${ach.id}_desc` as const
           return (
             <div
               key={ach.id}
@@ -24,8 +28,8 @@ export function BadgeList() {
                 <NesIcon name={ach.icon as NesIconName} size="2x" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="nes-text is-primary font-bold">{ach.name}</div>
-                <div className="nes-text is-disabled text-xs">{ach.desc}</div>
+                <div className="nes-text is-primary font-bold">{t(nameKey)}</div>
+                <div className="nes-text is-disabled text-xs">{t(descKey)}</div>
                 {!unlocked && (
                   <div className="mt-1.5">
                     <progress className="nes-progress is-primary" value={progress} max={100} />

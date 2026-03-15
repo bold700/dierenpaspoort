@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import { useAppStore } from './store/useAppStore'
+import { useTranslations } from './i18n/useTranslations'
 import { Header } from './components/Header'
 import { TabBar } from './components/TabBar'
 import { ScanPanel } from './components/ScanPanel'
@@ -9,13 +10,14 @@ import { BadgeList } from './components/BadgeList'
 import { SettingsPanel } from './components/SettingsPanel'
 
 function StatsRow() {
+  const { t } = useTranslations()
   const totalSeen = useAppStore((s) => s.totalSeen)
   const collectionLength = useAppStore((s) => s.collection.length)
   const streak = useAppStore((s) => s.streak)
   const items = [
-    { value: totalSeen, label: 'Gezien', labelShort: 'Gez.' },
-    { value: collectionLength, label: 'Soorten', labelShort: 'Soort.' },
-    { value: streak, label: 'Streak', labelShort: 'Str.' },
+    { value: totalSeen, label: t('statsSeen'), labelShort: t('statsSeenShort') },
+    { value: collectionLength, label: t('statsSpecies'), labelShort: t('statsSpeciesShort') },
+    { value: streak, label: t('statsStreak'), labelShort: t('statsStreakShort') },
   ]
   return (
     <div className="flex gap-0 mb-4 min-w-0">
@@ -32,12 +34,18 @@ function StatsRow() {
   )
 }
 
+function SettingsTitle() {
+  const { t } = useTranslations()
+  return <p className="title">{t('appSettings')}</p>
+}
+
 function MainLayout({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslations()
   return (
     <div className="mx-2 sm:mx-4 w-full min-w-0">
       <Header />
       <div className="nes-container is-rounded with-title is-dark mb-6 w-full min-w-0 overflow-hidden px-3 sm:px-4 pb-4 sm:pb-5">
-        <p className="title">Scherm</p>
+        <p className="title">{t('appScreen')}</p>
         <div className="pt-1">
           <StatsRow />
           <TabBar />
@@ -63,7 +71,7 @@ export default function App() {
               <div className="mx-2 sm:mx-4 w-full min-w-0">
                 <Header />
                 <div className="nes-container is-rounded with-title is-dark mb-6 w-full">
-                  <p className="title">Instellingen</p>
+                  <SettingsTitle />
                   <SettingsPanel />
                 </div>
               </div>
