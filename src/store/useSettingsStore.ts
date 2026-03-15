@@ -14,6 +14,8 @@ export interface SettingsState {
   elKey: string
   voiceId: string
   profileIcon: ProfileIconName
+  /** Data URL van profielfoto (klein formaat); null = gebruik icoon */
+  profilePhoto: string | null
 }
 
 const STORAGE_KEY = 'dp_settings'
@@ -23,7 +25,11 @@ function load(): SettingsState {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return getDefault()
     const parsed = JSON.parse(raw) as Partial<SettingsState>
-    return { ...getDefault(), ...parsed }
+    return {
+      ...getDefault(),
+      ...parsed,
+      profilePhoto: parsed.profilePhoto ?? null,
+    }
   } catch {
     return getDefault()
   }
@@ -37,7 +43,8 @@ function getDefault(): SettingsState {
     tts: 'browser',
     elKey: '',
     voiceId: VOICES[0].id,
-    profileIcon: 'heart'
+    profileIcon: 'heart',
+    profilePhoto: null
   }
 }
 
@@ -55,6 +62,7 @@ export const useSettingsStore = create<SettingsState & {
   setElKey: (k: string) => void
   setVoiceId: (id: string) => void
   setProfileIcon: (icon: ProfileIconName) => void
+  setProfilePhoto: (photo: string | null) => void
   hasApiKey: () => boolean
   hasElKey: () => boolean
 }>((set, get) => ({
@@ -87,6 +95,10 @@ export const useSettingsStore = create<SettingsState & {
   setProfileIcon(profileIcon) {
     set({ profileIcon })
     save({ ...get(), profileIcon })
+  },
+  setProfilePhoto(profilePhoto) {
+    set({ profilePhoto })
+    save({ ...get(), profilePhoto })
   },
   hasApiKey() {
     return !!get().apiKey

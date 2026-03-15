@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSettingsStore } from '../store/useSettingsStore'
 import { useAppStore } from '../store/useAppStore'
@@ -28,14 +28,18 @@ export function SettingsPanel() {
     elKey,
     voiceId,
     profileIcon,
+    profilePhoto,
     setProvider,
     setApiKey,
     setTTS,
     setElKey,
     setVoiceId,
     setProfileIcon,
+    setProfilePhoto,
     hasElKey,
   } = useSettingsStore()
+
+  const profilePhotoInputRef = useRef<HTMLInputElement>(null)
 
   const resetAll = useAppStore((s) => s.resetAll)
   const { speakElevenLabs } = useSpeak()
@@ -89,6 +93,50 @@ export function SettingsPanel() {
 
   const keyMask = (k: string) => (k ? `${k.slice(0, 6)}••••${k.slice(-4)}` : '')
 
+  const resizeImageToDataUrl = (file: File, maxSize: number): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const img = new Image()
+      const url = URL.createObjectURL(file)
+      img.onload = () => {
+        URL.revokeObjectURL(url)
+        const size = Math.min(img.naturalWidth || img.width, img.naturalHeight || img.height, maxSize)
+        const canvas = document.createElement('canvas')
+        canvas.width = size
+        canvas.height = size
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          reject(new Error('Canvas not supported'))
+          return
+        }
+        const w = img.naturalWidth || img.width
+        const h = img.naturalHeight || img.height
+        const scale = size / Math.min(w, h)
+        const dw = w * scale
+        const dh = h * scale
+        const dx = (size - dw) / 2
+        const dy = (size - dh) / 2
+        ctx.drawImage(img, 0, 0, w, h, dx, dy, dw, dh)
+        resolve(canvas.toDataURL('image/jpeg', 0.92))
+      }
+      img.onerror = () => {
+        URL.revokeObjectURL(url)
+        reject(new Error('Image load failed'))
+      }
+      img.src = url
+    })
+
+  const handleProfilePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file?.type.startsWith('image/')) return
+    e.target.value = ''
+    try {
+      const dataUrl = await resizeImageToDataUrl(file, 192)
+      setProfilePhoto(dataUrl)
+    } catch {
+      showToast(t('settingsProfilePhotoError'))
+    }
+  }
+
   return (
     <div className="space-y-4 pb-8">
       <div className="nes-container is-rounded is-dark">
@@ -109,6 +157,45 @@ export function SettingsPanel() {
 
       <div className="nes-container is-rounded is-dark">
         <p className="nes-text is-primary text-xs font-bold mb-3">{t('settingsProfileIcon')}</p>
+        <input
+          ref={profilePhotoInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleProfilePhotoChange}
+        />
+        <div className="flex flex-col sm:flex-row items-start gap-3 mb-3">
+          <div className="relative flex shrink-0 items-center justify-center w-16 h-16 min-w-[4rem] min-h-[4rem] nes-container is-rounded overflow-hidden bg-[#212529] p-0">
+            {profilePhoto ? (
+              <img
+                src={profilePhoto}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover object-center"
+              />
+            ) : (
+              <NesIcon name={profileIcon} size="4x" />
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="nes-btn is-primary"
+              onClick={() => profilePhotoInputRef.current?.click()}
+            >
+              {t('settingsProfilePhotoChoose')}
+            </button>
+            {profilePhoto && (
+              <button
+                type="button"
+                className="nes-btn"
+                onClick={() => setProfilePhoto(null)}
+              >
+                {t('settingsProfilePhotoRemove')}
+              </button>
+            )}
+          </div>
+        </div>
+        <p className="nes-text is-disabled text-xs mb-2">{t('settingsProfileIconOr')}</p>
         <div className="flex flex-wrap gap-2">
           {ALL_ICON_IDS.map((id) => (
             <button
@@ -116,7 +203,7 @@ export function SettingsPanel() {
               type="button"
               onClick={() => setProfileIcon(id)}
               className={`nes-container is-rounded is-dark flex items-center justify-center w-10 h-10 p-0 cursor-pointer ${
-                profileIcon === id ? 'ring-2 ring-[#209cee]' : ''
+                !profilePhoto && profileIcon === id ? 'ring-2 ring-[#209cee]' : ''
               }`}
               aria-label={`Icoon ${id}`}
             >

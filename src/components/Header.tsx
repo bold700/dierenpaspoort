@@ -9,6 +9,7 @@ export function Header() {
   const location = useLocation()
   const isSettings = location.pathname === '/settings'
   const profileIcon = useSettingsStore((s) => s.profileIcon)
+  const profilePhoto = useSettingsStore((s) => s.profilePhoto)
 
   const level = useAppStore((s) => s.level)
   const totalXP = useAppStore((s) => s.totalXP)
@@ -23,8 +24,16 @@ export function Header() {
 
         <div className="flex items-center justify-between gap-3 pt-1">
           <Link to="/" className="flex items-center gap-3 min-w-0">
-            <span className="flex shrink-0 items-center justify-center w-11 h-11 nes-container is-rounded overflow-hidden">
-              <NesIcon name={profileIcon} />
+            <span className="relative flex shrink-0 items-center justify-center w-11 h-11 min-w-[2.75rem] min-h-[2.75rem] nes-container is-rounded overflow-hidden bg-[#212529] p-0">
+              {profilePhoto ? (
+                <img
+                  src={profilePhoto}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover object-center"
+                />
+              ) : (
+                <NesIcon name={profileIcon} />
+              )}
             </span>
             <div className="min-w-0">
               <div className="nes-text is-primary font-bold leading-tight">{t('headerLevel')} {level}</div>
