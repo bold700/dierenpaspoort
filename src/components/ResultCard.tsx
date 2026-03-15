@@ -34,6 +34,13 @@ const TYPE_KEYS: Record<string, string> = {
   fantasie: 'typeFantasie',
 }
 
+function shouldShowBreed(breed?: string): boolean {
+  if (!breed) return false
+  const trimmed = breed.trim()
+  if (!trimmed) return false
+  return !['onbekend', 'unknown', 'niet zeker', 'onzeker'].some((hint) => trimmed.toLowerCase().includes(hint))
+}
+
 interface ResultCardProps {
   animal: AnimalResult
   xpGained: number
@@ -50,6 +57,7 @@ export function ResultCard({ animal, xpGained, isNew, onSpeakAll, onSpeakIntro, 
   const { t } = useTranslations()
   const { speak } = useSpeak()
   const slug = slugify(animal.zeldzaamheid)
+  const showBreed = shouldShowBreed(animal.ras)
 
   useEffect(() => {
     if (fromCollection) return
@@ -79,6 +87,11 @@ export function ResultCard({ animal, xpGained, isNew, onSpeakAll, onSpeakIntro, 
             <span className="nes-badge is-warning text-[10px]">{t(TYPE_KEYS[animal.type.toLowerCase()])}</span>
           )}
         </p>
+        {showBreed && (
+          <p className="text-center text-xs nes-text is-disabled mb-1">
+            {t('resultBreedLabel')}: {animal.ras}
+          </p>
+        )}
         <div className="flex flex-wrap items-center justify-center gap-2 relative py-2">
           <button
             type="button"

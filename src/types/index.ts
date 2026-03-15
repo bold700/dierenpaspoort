@@ -6,6 +6,10 @@ export type ScanType = 'echt' | 'plaatje' | 'speelgoed' | 'dinosaurus' | 'fantas
 export interface AnimalResult {
   naam: string
   emoji: string
+  /** Diergroep/soort, bijv. "hond", "kat", "paard". */
+  soort?: string
+  /** Ras (vooral bij huisdieren), bijv. "Labrador Retriever". */
+  ras?: string
   /** Optioneel: plaatje, speelgoed, dinosaurus of fantasie (draak, eenhoorn, etc.). */
   type?: ScanType
   zeldzaamheid: Zeldzaamheid
