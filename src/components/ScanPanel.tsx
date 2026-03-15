@@ -119,7 +119,9 @@ export function ScanPanel() {
   const startCamera = useCallback(async () => {
     setCameraError(null)
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true })
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } }
+      })
       streamRef.current = stream
       setCameraActive(true)
     } catch (err) {
@@ -194,7 +196,6 @@ export function ScanPanel() {
           ref={fileInputRef}
           type="file"
           accept="image/*"
-          capture="environment"
           className="hidden"
           onChange={handleFile}
         />
