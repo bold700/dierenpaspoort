@@ -121,6 +121,9 @@ export function CollectionGrid() {
                 <AnimalImage naam={a.name} emoji={a.emoji} size={52} />
               </div>
               <div className="nes-text is-primary text-[11px] font-bold truncate break-words min-w-0">{a.name}</div>
+              {a.detail?.soort && a.detail.soort.toLowerCase() !== a.name.toLowerCase() && (
+                <div className="nes-text is-disabled text-[9px] truncate">{a.detail.soort}</div>
+              )}
               <div className="nes-text is-disabled text-[10px]">{a.times} {t('collectionTimesSeen')}</div>
             </button>
           )

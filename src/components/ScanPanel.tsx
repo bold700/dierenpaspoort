@@ -157,11 +157,14 @@ export function ScanPanel() {
     if (!result) return
     const a = result.animal
     const type = a.type
+    const soortSuffix = a.soort && a.soort.toLowerCase() !== a.naam.toLowerCase()
+      ? `. ${t('speakIntroSoort', { soort: a.soort })}`
+      : ''
     if (type === 'dinosaurus') speak(`${a.naam}! ${t('speakIntroDino')}`)
     else if (type === 'fantasie') speak(`${a.naam}! ${t('speakIntroFantasie')}`)
-    else if (type === 'plaatje') speak(t('speakIntroPlaatje', { name: a.naam }))
-    else if (type === 'speelgoed') speak(t('speakIntroSpeelgoed', { name: a.naam }))
-    else speak(`${a.naam}!`)
+    else if (type === 'plaatje') speak(t('speakIntroPlaatje', { name: a.naam }) + soortSuffix)
+    else if (type === 'speelgoed') speak(t('speakIntroSpeelgoed', { name: a.naam }) + soortSuffix)
+    else speak(`${a.naam}!${soortSuffix}`)
   }, [result, speak, t])
 
   const speakAll = useCallback(() => {

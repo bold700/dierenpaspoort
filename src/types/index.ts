@@ -5,6 +5,8 @@ export type ScanType = 'echt' | 'plaatje' | 'speelgoed' | 'dinosaurus' | 'fantas
 
 export interface AnimalResult {
   naam: string
+  /** Overkoepelende diercategorie, bijv. "Hond", "Kat", "Vogel". */
+  soort?: string
   emoji: string
   /** Optioneel: plaatje, speelgoed, dinosaurus of fantasie (draak, eenhoorn, etc.). */
   type?: ScanType

@@ -79,6 +79,11 @@ export function ResultCard({ animal, xpGained, isNew, onSpeakAll, onSpeakIntro, 
             <span className="nes-badge is-warning text-[10px]">{t(TYPE_KEYS[animal.type.toLowerCase()])}</span>
           )}
         </p>
+        {animal.soort && animal.soort.toLowerCase() !== animal.naam.toLowerCase() && (
+          <p className="text-center -mt-1 mb-1">
+            <span className="nes-text is-disabled text-xs">{animal.soort}</span>
+          </p>
+        )}
         <div className="flex flex-wrap items-center justify-center gap-2 relative py-2">
           <button
             type="button"
