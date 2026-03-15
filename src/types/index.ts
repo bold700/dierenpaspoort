@@ -3,8 +3,13 @@ export type Zeldzaamheid = 'Gewoon' | 'Bijzonder' | 'Zeldzaam' | 'Superschaars'
 /** Bron van de scan: echt dier, plaatje, speelgoed of fantasie (dino/draak). */
 export type ScanType = 'echt' | 'plaatje' | 'speelgoed' | 'dinosaurus' | 'fantasie'
 
+/** Specifiek diersoort voor rasherkenning (hond of kat). */
+export type DierSoort = 'hond' | 'kat'
+
 export interface AnimalResult {
   naam: string
+  /** Gevuld bij honden en katten: geeft aan dat het een specifiek ras betreft. */
+  soort?: DierSoort
   emoji: string
   /** Optioneel: plaatje, speelgoed, dinosaurus of fantasie (draak, eenhoorn, etc.). */
   type?: ScanType

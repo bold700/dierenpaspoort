@@ -34,6 +34,11 @@ const TYPE_KEYS: Record<string, string> = {
   fantasie: 'typeFantasie',
 }
 
+const SOORT_BADGE: Record<string, { label: string; emoji: string }> = {
+  hond: { label: 'Hondenras', emoji: '🐕' },
+  kat: { label: 'Kattenras', emoji: '🐈' },
+}
+
 interface ResultCardProps {
   animal: AnimalResult
   xpGained: number
@@ -75,6 +80,11 @@ export function ResultCard({ animal, xpGained, isNew, onSpeakAll, onSpeakIntro, 
       <div className="nes-container is-rounded with-title is-dark mb-0">
         <p className="title flex flex-wrap items-center justify-center gap-2">
           <span className="nes-text is-primary">{animal.naam}</span>
+          {animal.soort && SOORT_BADGE[animal.soort] && (
+            <span className="nes-badge is-primary text-[10px]">
+              {SOORT_BADGE[animal.soort].emoji} {SOORT_BADGE[animal.soort].label}
+            </span>
+          )}
           {animal.type && TYPE_KEYS[animal.type.toLowerCase()] && (
             <span className="nes-badge is-warning text-[10px]">{t(TYPE_KEYS[animal.type.toLowerCase()])}</span>
           )}
