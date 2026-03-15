@@ -50,6 +50,10 @@ export function ResultCard({ animal, xpGained, isNew, onSpeakAll, onSpeakIntro, 
   const { t } = useTranslations()
   const { speak } = useSpeak()
   const slug = slugify(animal.zeldzaamheid)
+  const infoBadges = [
+    animal.soort ? `${t('resultSpeciesLabel')}: ${animal.soort}` : null,
+    animal.ras ? `${t('resultBreedLabel')}: ${animal.ras}` : null,
+  ].filter(Boolean) as string[]
 
   useEffect(() => {
     if (fromCollection) return
@@ -79,6 +83,15 @@ export function ResultCard({ animal, xpGained, isNew, onSpeakAll, onSpeakIntro, 
             <span className="nes-badge is-warning text-[10px]">{t(TYPE_KEYS[animal.type.toLowerCase()])}</span>
           )}
         </p>
+        {infoBadges.length > 0 && (
+          <div className="mb-2 flex flex-wrap items-center justify-center gap-2">
+            {infoBadges.map((text) => (
+              <span key={text} className="nes-badge is-dark">
+                <span>{text}</span>
+              </span>
+            ))}
+          </div>
+        )}
         <div className="flex flex-wrap items-center justify-center gap-2 relative py-2">
           <button
             type="button"

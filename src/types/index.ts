@@ -6,6 +6,10 @@ export type ScanType = 'echt' | 'plaatje' | 'speelgoed' | 'dinosaurus' | 'fantas
 export interface AnimalResult {
   naam: string
   emoji: string
+  /** Algemene diersoort of diergroep, bijvoorbeeld "Hond". */
+  soort?: string
+  /** Specifieke rasnaam of mix als die herkenbaar is, bijvoorbeeld "Labrador retriever". */
+  ras?: string
   /** Optioneel: plaatje, speelgoed, dinosaurus of fantasie (draak, eenhoorn, etc.). */
   type?: ScanType
   zeldzaamheid: Zeldzaamheid
@@ -26,8 +30,22 @@ export interface AnimalNotFound {
 
 export type ScanResponse = AnimalResult | AnimalNotFound
 
+export interface DogBreedResult {
+  naam: string
+  emoji?: string
+  soort?: string
+  ras?: string
+  gevonden: true
+}
+
+export type DogBreedResponse = DogBreedResult | AnimalNotFound
+
 export function isAnimalResult(r: ScanResponse): r is AnimalResult {
   return r.gevonden === true
+}
+
+export function isDogBreedResult(r: DogBreedResponse): r is DogBreedResult {
+  return r.gevonden === true && typeof r.naam === 'string'
 }
 
 export interface CollectionItem {
