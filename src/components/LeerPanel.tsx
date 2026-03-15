@@ -2,6 +2,7 @@ import { useSpeak } from '../hooks/useSpeak'
 import { LEER_DIEREN } from '../data/leerDieren'
 import type { LeerDier } from '../data/leerDieren'
 import { NesIcon } from './NesIcon'
+import { AnimalImage } from './AnimalImage'
 
 const CATEGORIE_LABEL: Record<LeerDier['categorie'], string> = {
   zoogdier: 'Zoogdieren',
@@ -12,20 +13,24 @@ const CATEGORIE_LABEL: Record<LeerDier['categorie'], string> = {
   overig: 'Overig',
 }
 
+function pickRandom<T>(arr: [T, T, T, T, T]): T {
+  return arr[Math.floor(Math.random() * 5)]
+}
+
 function DierKaart({ dier }: { dier: LeerDier }) {
   const { speak } = useSpeak()
-  const teZeggen = `Dit is een ${dier.naam}. ${dier.beschrijving}`
+  const teZeggen = `Dit is een ${dier.naam}. ${pickRandom(dier.weetjes)}`
 
   return (
     <button
       type="button"
       onClick={() => speak(teZeggen)}
-      className="nes-container is-rounded is-dark w-full min-w-0 py-3 px-2 text-center cursor-pointer min-h-[5rem] flex flex-col items-center justify-center gap-1"
+      className="nes-container is-rounded is-dark w-full min-w-0 py-3 px-2 text-center cursor-pointer min-h-[5rem] flex flex-col items-center justify-center gap-1 transition-[transform,filter] duration-150 ease-out hover:brightness-110 hover:scale-[1.02] active:brightness-90 active:scale-[0.96] active:bg-black/20"
       aria-label={`Luister naar ${dier.naam}`}
     >
-      <span className="text-3xl leading-none">{dier.emoji}</span>
+      <AnimalImage naam={dier.naam} emoji={dier.emoji} size={64} />
       <span className="nes-text is-primary text-sm font-bold leading-tight line-clamp-2 break-words min-w-0">
-        {dier.naam}
+        {dier.kort ?? dier.naam}
       </span>
     </button>
   )

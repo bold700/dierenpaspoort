@@ -3,16 +3,18 @@ import { useSettingsStore } from '../store/useSettingsStore'
 
 const ELEVENLABS_URL = 'https://api.elevenlabs.io/v1/text-to-speech/'
 
+/** Gedeelde ref zodat elke speak()-aanroep (van welke component dan ook) de vorige audio stopt. */
+const globalAudioRef = { current: null as HTMLAudioElement | null }
+
 export function useSpeak() {
-  const currentAudioRef = useRef<HTMLAudioElement | null>(null)
   const speakIdRef = useRef(0)
 
   const stopAllSpeech = useCallback(() => {
     window.speechSynthesis.cancel()
-    if (currentAudioRef.current) {
-      currentAudioRef.current.pause()
-      currentAudioRef.current.currentTime = 0
-      currentAudioRef.current = null
+    if (globalAudioRef.current) {
+      globalAudioRef.current.pause()
+      globalAudioRef.current.currentTime = 0
+      globalAudioRef.current = null
     }
   }, [])
 
@@ -61,13 +63,13 @@ export function useSpeak() {
         if (myId !== speakIdRef.current) return
         const url = URL.createObjectURL(blob)
         const audio = new Audio(url)
-        currentAudioRef.current = audio
+        globalAudioRef.current = audio
         audio.onended = () => {
           URL.revokeObjectURL(url)
-          if (currentAudioRef.current === audio) currentAudioRef.current = null
+          if (globalAudioRef.current === audio) globalAudioRef.current = null
         }
         audio.onerror = () => {
-          if (currentAudioRef.current === audio) currentAudioRef.current = null
+          if (globalAudioRef.current === audio) globalAudioRef.current = null
         }
         await audio.play()
       } catch {

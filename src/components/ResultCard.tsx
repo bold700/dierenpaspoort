@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import type { AnimalResult } from '../types'
 import { useSpeak } from '../hooks/useSpeak'
 import { NesIcon } from './NesIcon'
+import { AnimalImage } from './AnimalImage'
 
 function slugify(z: string): string {
   const s = z.toLowerCase().replace(/\s/g, '')
@@ -67,7 +68,7 @@ export function ResultCard({ animal, xpGained, isNew, onSpeakAll, onSpeakIntro, 
           >
             <NesIcon name="play" />
           </button>
-          <span className="text-5xl leading-none">{animal.emoji}</span>
+          <AnimalImage naam={animal.naam} emoji={animal.emoji} size={88} className="shrink-0" />
           <span className={`nes-badge ${rarityBadgeClass[slug] ?? 'is-success'}`}>
             <span>{animal.zeldzaamheid}</span>
           </span>

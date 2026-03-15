@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAppStore } from '../store/useAppStore'
 import { useSpeak } from '../hooks/useSpeak'
 import { ResultCard } from './ResultCard'
+import { AnimalImage } from './AnimalImage'
 import type { CollectionItem } from '../types'
 
 function slugify(r: string): string {
@@ -78,7 +79,7 @@ export function CollectionGrid() {
             <div className="nes-container is-rounded is-dark with-title">
               <p className="title">{selected.name}</p>
               <div className="flex flex-col items-center gap-2 py-4">
-                <span className="text-4xl">{selected.emoji}</span>
+                <AnimalImage naam={selected.name} emoji={selected.emoji} size={80} />
                 <span className="nes-badge is-primary">{selected.rarity}</span>
                 <p className="nes-text is-disabled text-sm m-0">{selected.times}x gezien</p>
                 <p className="nes-text is-disabled text-xs m-0 text-center">
@@ -104,7 +105,9 @@ export function CollectionGrid() {
                 className="absolute top-1 right-1 w-2 h-2 rounded-sm"
                 style={{ backgroundColor: dotColor[slug] ?? dotColor.gewoon }}
               />
-              <div className="text-2xl mb-0.5">{a.emoji}</div>
+              <div className="flex justify-center mb-0.5">
+                <AnimalImage naam={a.name} emoji={a.emoji} size={52} />
+              </div>
               <div className="nes-text is-primary text-[11px] font-bold truncate break-words min-w-0">{a.name}</div>
               <div className="nes-text is-disabled text-[10px]">{a.times}x</div>
             </button>

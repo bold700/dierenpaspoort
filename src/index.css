@@ -45,6 +45,26 @@ body::-webkit-scrollbar {
   cursor: not-allowed;
 }
 
+/* Klikfeedback: zichtbaar bij indrukken voor alle klikbare elementen */
+.app-shell button,
+.app-shell a,
+.app-shell [role="button"],
+.app-shell .cursor-pointer {
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+.app-shell button:active,
+.app-shell a:active,
+.app-shell [role="button"]:active,
+.app-shell .cursor-pointer:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+.app-shell button:disabled:active,
+.app-shell .nes-btn.is-disabled:active {
+  transform: none;
+  opacity: 1;
+}
+
 /* Safe area voor notches / PWA;zelfde achtergrond als NES is-dark containers */
 .app-shell {
   min-height: 100vh;
