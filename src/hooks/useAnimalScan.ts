@@ -150,9 +150,18 @@ export function useAnimalScan() {
           if (data.error) throw new Error(data.error.message ?? 'Anthropic error')
           raw = data.content.map((c: { text?: string }) => c.text ?? '').join('')
         }
-        const response = parseResponse(raw)
-        if (isAnimalResult(response)) return normalizeAnimalResult(response)
-        return null
+        try {
+          const response = parseResponse(raw)
+          if (isAnimalResult(response)) return normalizeAnimalResult(response)
+          return null
+        } catch (parseErr) {
+          const msg =
+            parseErr instanceof Error
+              ? parseErr.message
+              : 'De AI gaf geen geldige dier-info terug. Probeer een andere foto.'
+          setError(msg)
+          return null
+        }
       } catch (e) {
         const message = e instanceof Error ? e.message : 'Er ging iets mis'
         setError(message)

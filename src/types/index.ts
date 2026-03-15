@@ -39,6 +39,8 @@ export interface CollectionItem {
   emoji: string
   rarity: string
   times: number
+  /** Soort in het Nederlands (voor groepering: zelfde dier in andere talen = één item). */
+  soort?: string
   /** Volledige scaninfo om in collectie weer te geven (vanaf eerste/laatste scan). */
   detail?: AnimalResult
 }
@@ -56,6 +58,10 @@ export interface AppState {
   level: number
   totalSeen: number
   streak: number
+  /** Laatste scan-datum (YYYY-MM-DD) voor streak-berekening */
+  lastScanDate: string | null
+  /** Unieke datums waarop gescand is (voor wekelijkse/maandelijkse doelen) */
+  scanDates: string[]
   collection: CollectionItem[]
   foundRare: boolean
   unlockedAchievements: string[]

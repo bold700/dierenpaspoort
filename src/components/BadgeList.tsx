@@ -41,6 +41,12 @@ export function BadgeList() {
           )
         })}
       </div>
+
+      {/* Abo-haak: dagelijks → wekelijks → maandelijks → abonnement */}
+      <div className="mt-6 nes-container is-rounded is-dark p-4 border border-primary/30">
+        <p className="nes-text is-primary text-sm font-bold mb-1">{t('badgesPremiumTitle')}</p>
+        <p className="nes-text is-disabled text-xs">{t('badgesPremiumDesc')}</p>
+      </div>
     </div>
   )
 }

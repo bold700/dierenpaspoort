@@ -65,13 +65,12 @@ export function ScanPanel() {
       }
 
       const levelBefore = useAppStore.getState().level
-      const isNew = !useAppStore.getState().collection.some((c) => c.name === animal.naam)
-      const xpGained = addSeenAnimal(
+      const { xpGained, isNew } = addSeenAnimal(
         animal.naam,
         animal.emoji,
         animal.zeldzaamheid,
         animal.xp ?? 25,
-        isNew,
+        false,
         animal.zeldzaamheid === 'Zeldzaam' || animal.zeldzaamheid === 'Superschaars',
         animal
       )

@@ -8,6 +8,10 @@ const base = process.env.GITHUB_PAGES === 'true' ? '/dierenpaspoort/' : '/'
 
 export default defineConfig({
   base,
+  test: {
+    globals: true,
+    environment: 'node'
+  },
   resolve: {
     alias: { '@': path.resolve(__dirname, './src') }
   },

@@ -27,7 +27,7 @@ Herken ook:
 - Dino's en fantasiedieren: dinosaurussen (T-Rex, Triceratops, Brachiosaurus, enz.), draken, eenhoorns, enz. Gebruik Nederlandse namen waar die bestaan (T-Rex, Draak, Eenhoorn). Geef "type":"dinosaurus" of "type":"fantasie". Verzin kindvriendelijke gewicht/lengte/leeftijd en weetjes alsof het echt bestond.
 
 Belangrijk voor specifiek herkennen:
-- Vul altijd "soort" met de diersoort (bijv. "hond", "kat", "paard", "arend").
+- Vul altijd "soort" met de diersoort in het NEDERLANDS (bijv. "hond", "kat", "paard", "neushoorn", "tijger"). Gebruik alleen Nederlandse soortnamen, zodat hetzelfde dier in elke taal als één dier in de collectie telt.
 - Vul "ras" alleen in als dat zinvol is (vooral huisdieren en sommige landbouwdieren), anders een lege string.
 - Als het een hond is: geef het ras zo specifiek mogelijk. Zet bij honden in "naam" ook het ras (dus niet alleen "hond"). Voorbeeld: "Labrador Retriever", "Border Collie", "Franse Bulldog".
 - Als ras niet zeker is, geef de beste gok in "ras" met een korte nuance zoals "waarschijnlijk", maar blijf specifiek.
@@ -37,10 +37,10 @@ Standaard JSON (altijd alle velden vullen):
 
 Alleen als er echt geen dier, plaatje, speelgoed of fantasiedier herkenbaar is: {"gevonden":false}`
 
-/** Prompt met taalinstructie: alle tekst in de gekozen taal. */
+/** Prompt met taalinstructie: alle tekst in de gekozen taal; soort blijft Nederlands voor groepering. */
 export function getAIPromptForLocale(locale: Locale): string {
   const lang = AI_LANGUAGE_NAMES[locale]
   return `${AI_PROMPT}
 
-IMPORTANT: Return ALL text in ${lang}. Every JSON string field must be in ${lang} only: naam, soort, ras, zeldzaamheid, gewicht, lengte, leeftijd, vergelijking_gewicht, vergelijking_snelheid, vergelijking_lengte, and each item in weetjes. Use ${lang} for units and comparisons (e.g. "kg", "meters" or "m", "years" or local equivalent). Keep the JSON structure and keys unchanged.`
+IMPORTANT: Return ALL text in ${lang} EXCEPT the field "soort". Keep "soort" always in DUTCH (e.g. neushoorn, tijger, hond, gorilla), so the same animal counts as one in the collection regardless of language. All other JSON string fields in ${lang}: naam, ras, zeldzaamheid, gewicht, lengte, leeftijd, vergelijking_gewicht, vergelijking_snelheid, vergelijking_lengte, and each item in weetjes. Use ${lang} for units and comparisons. Keep the JSON structure and keys unchanged.`
 }
