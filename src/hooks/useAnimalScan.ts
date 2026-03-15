@@ -4,9 +4,78 @@ import { getAIPromptForLocale } from '../constants'
 import type { ScanResponse, AnimalResult } from '../types'
 import { isAnimalResult } from '../types'
 
+const GENERIC_DOG_NAMES = new Set([
+  'hond',
+  'dog',
+  'perro',
+  'chien',
+  '狗',
+  '犬',
+])
+
+const UNKNOWN_BREED_HINTS = [
+  'onbekend',
+  'unknown',
+  'niet zeker',
+  'onzeker',
+  'mix',
+  'kruising',
+  'mongrel',
+  'mestizo',
+  'croise',
+  'croisé',
+  '杂交',
+  '未知',
+  '不确定',
+]
+
 function parseResponse(text: string): ScanResponse {
   const cleaned = text.trim().replace(/```json|```/g, '').trim()
   return JSON.parse(cleaned) as ScanResponse
+}
+
+function normalizeText(value: string | undefined): string {
+  return (value ?? '').replace(/\s+/g, ' ').trim()
+}
+
+function isDogSpecies(species: string): boolean {
+  const s = species.toLowerCase()
+  return ['hond', 'dog', 'perro', 'chien', '狗', '犬'].some((v) => s === v || s.includes(v))
+}
+
+function isGenericDogName(name: string): boolean {
+  return GENERIC_DOG_NAMES.has(name.toLowerCase())
+}
+
+function isUnknownBreed(breed: string): boolean {
+  const b = breed.toLowerCase()
+  return UNKNOWN_BREED_HINTS.some((hint) => b.includes(hint))
+}
+
+function normalizeAnimalResult(animal: AnimalResult): AnimalResult {
+  const name = normalizeText(animal.naam)
+  const species = normalizeText(animal.soort)
+  let breed = normalizeText(animal.ras)
+  const dog = isDogSpecies(species) || isGenericDogName(name)
+
+  if (dog && !breed && name && !isGenericDogName(name)) {
+    // Model zette het ras soms in "naam" maar liet "ras" leeg.
+    breed = name
+  }
+
+  const normalized: AnimalResult = {
+    ...animal,
+    naam: name || animal.naam,
+  }
+
+  if (species) normalized.soort = species
+  if (breed) normalized.ras = breed
+
+  if (dog && breed && !isUnknownBreed(breed)) {
+    normalized.naam = breed
+  }
+
+  return normalized
 }
 
 export function useAnimalScan() {
@@ -82,7 +151,7 @@ export function useAnimalScan() {
           raw = data.content.map((c: { text?: string }) => c.text ?? '').join('')
         }
         const response = parseResponse(raw)
-        if (isAnimalResult(response)) return response
+        if (isAnimalResult(response)) return normalizeAnimalResult(response)
         return null
       } catch (e) {
         const message = e instanceof Error ? e.message : 'Er ging iets mis'
