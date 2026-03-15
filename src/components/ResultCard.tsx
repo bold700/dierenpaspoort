@@ -23,20 +23,23 @@ interface ResultCardProps {
   xpGained: number
   isNew: boolean
   onSpeakAll: () => void
+  /** Alleen bij scan: eerste automatische zin (bijv. alleen diernaam); anders onSpeakAll */
+  onSpeakIntro?: () => void
   /** Vanuit collectie: geen auto-speak, toon "Nx gezien" i.p.v. XP/Nieuw */
   fromCollection?: boolean
   times?: number
 }
 
-export function ResultCard({ animal, xpGained, isNew, onSpeakAll, fromCollection, times }: ResultCardProps) {
+export function ResultCard({ animal, xpGained, isNew, onSpeakAll, onSpeakIntro, fromCollection, times }: ResultCardProps) {
   const { speak } = useSpeak()
   const slug = slugify(animal.zeldzaamheid)
 
   useEffect(() => {
     if (fromCollection) return
-    const t = setTimeout(onSpeakAll, 600)
+    const sayFirst = onSpeakIntro ?? onSpeakAll
+    const t = setTimeout(sayFirst, 600)
     return () => clearTimeout(t)
-  }, [animal.naam, onSpeakAll, fromCollection])
+  }, [animal.naam, onSpeakAll, onSpeakIntro, fromCollection])
 
   const weightSpeech = `Dit dier weegt ${animal.gewicht}. ${animal.vergelijking_gewicht}`
   const lengthSpeech = `Dit dier is ${animal.lengte} lang. ${animal.vergelijking_lengte}`
@@ -73,7 +76,7 @@ export function ResultCard({ animal, xpGained, isNew, onSpeakAll, fromCollection
 
       <div className="nes-container is-rounded is-dark with-title mt-2">
         <p className="title">Tik om te horen</p>
-        <div className="grid grid-cols-3 gap-2 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
           <button
             type="button"
             onClick={() => speak(weightSpeech)}

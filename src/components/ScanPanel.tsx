@@ -91,11 +91,16 @@ export function ScanPanel() {
     [scan, error, speak, showToast, addSeenAnimal, checkAchievements]
   )
 
+  const speakIntro = useCallback(() => {
+    if (!result) return
+    speak(`${result.animal.naam}!`)
+  }, [result, speak])
+
   const speakAll = useCallback(() => {
     if (!result) return
     const a = result.animal
     speak(
-      `${a.naam}! ${a.zeldzaamheid} dier. ${a.vergelijking_gewicht}. ${a.vergelijking_snelheid}. ${a.weetjes[0]}`
+      `${a.naam}! ${a.zeldzaamheid} dier. ${a.vergelijking_gewicht}. ${a.vergelijking_snelheid}. ${a.weetjes?.[0] ?? ''}`
     )
   }, [result, speak])
 
@@ -166,6 +171,7 @@ export function ScanPanel() {
           xpGained={result.xpGained}
           isNew={result.isNew}
           onSpeakAll={speakAll}
+          onSpeakIntro={speakIntro}
         />
       )}
     </div>

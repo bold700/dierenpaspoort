@@ -13,16 +13,19 @@ function StatsRow() {
   const collectionLength = useAppStore((s) => s.collection.length)
   const streak = useAppStore((s) => s.streak)
   const items = [
-    { value: totalSeen, label: 'Gezien' },
-    { value: collectionLength, label: 'Soorten' },
-    { value: streak, label: 'Streak' },
+    { value: totalSeen, label: 'Gezien', labelShort: 'Gez.' },
+    { value: collectionLength, label: 'Soorten', labelShort: 'Soort.' },
+    { value: streak, label: 'Streak', labelShort: 'Str.' },
   ]
   return (
-    <div className="flex gap-1.5 sm:gap-2 mb-4 min-w-0">
-      {items.map(({ value, label }) => (
+    <div className="flex gap-0 mb-4 min-w-0">
+      {items.map(({ value, label, labelShort }) => (
         <div key={label} className="nes-container is-rounded is-dark flex-1 min-w-0 text-center py-2 sm:py-2.5">
           <div className="nes-text is-primary text-lg sm:text-xl font-bold leading-none">{value}</div>
-          <div className="nes-text is-disabled text-[10px] sm:text-xs mt-0.5 truncate">{label}</div>
+          <div className="nes-text is-disabled text-[10px] sm:text-xs mt-0.5 leading-tight">
+            <span className="sm:hidden">{labelShort}</span>
+            <span className="hidden sm:inline">{label}</span>
+          </div>
         </div>
       ))}
     </div>

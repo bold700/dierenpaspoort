@@ -4,8 +4,8 @@ import { useSettingsStore } from '../store/useSettingsStore'
 const ELEVENLABS_URL = 'https://api.elevenlabs.io/v1/text-to-speech/'
 
 export function useSpeak() {
-  const { tts, elKey, voiceId } = useSettingsStore()
   const currentAudioRef = useRef<HTMLAudioElement | null>(null)
+  const speakIdRef = useRef(0)
 
   const stopAllSpeech = useCallback(() => {
     window.speechSynthesis.cancel()
@@ -29,10 +29,8 @@ export function useSpeak() {
     [stopAllSpeech]
   )
 
-  const speakIdRef = useRef(0)
-
-  const speakElevenLabs = useCallback(
-    async (text: string): Promise<void> => {
+  const speakElevenLabsWithKeys = useCallback(
+    async (text: string, elKey: string, voiceId: string): Promise<void> => {
       if (!elKey) {
         speakBrowser(text)
         return
@@ -76,20 +74,30 @@ export function useSpeak() {
         if (myId === speakIdRef.current) speakBrowser(text)
       }
     },
-    [elKey, voiceId, speakBrowser, stopAllSpeech]
+    [speakBrowser, stopAllSpeech]
   )
 
+  /** Gebruikt altijd actuele TTS-instelling uit de store (ook bij vertraagde aanroep, bv. level-up). */
   const speak = useCallback(
     async (text: string) => {
       if (!text) return
       stopAllSpeech()
+      const { tts, elKey, voiceId } = useSettingsStore.getState()
       if (tts === 'elevenlabs' && elKey) {
-        await speakElevenLabs(text)
+        await speakElevenLabsWithKeys(text, elKey, voiceId)
       } else {
         speakBrowser(text)
       }
     },
-    [tts, elKey, speakBrowser, speakElevenLabs, stopAllSpeech]
+    [speakBrowser, speakElevenLabsWithKeys, stopAllSpeech]
+  )
+
+  const speakElevenLabs = useCallback(
+    async (text: string) => {
+      const { elKey, voiceId } = useSettingsStore.getState()
+      await speakElevenLabsWithKeys(text, elKey, voiceId)
+    },
+    [speakElevenLabsWithKeys]
   )
 
   return { speak, speakBrowser, speakElevenLabs }
