@@ -19,6 +19,13 @@ const rarityBadgeClass: Record<string, string> = {
   gewoon: 'is-success',
 }
 
+const typeLabel: Record<string, string> = {
+  plaatje: 'Plaatje',
+  speelgoed: 'Speelgoed',
+  dinosaurus: 'Dino!',
+  fantasie: 'Fantasie',
+}
+
 interface ResultCardProps {
   animal: AnimalResult
   xpGained: number
@@ -57,16 +64,21 @@ export function ResultCard({ animal, xpGained, isNew, onSpeakAll, onSpeakIntro, 
   return (
     <div className="animate-fade-up mb-6">
       <div className="nes-container is-rounded with-title is-dark mb-0">
-        <p className="title"><span className="nes-text is-primary">{animal.naam}</span></p>
+        <p className="title flex flex-wrap items-center justify-center gap-2">
+          <span className="nes-text is-primary">{animal.naam}</span>
+          {animal.type && typeLabel[animal.type.toLowerCase()] && (
+            <span className="nes-badge is-warning text-[10px]">{typeLabel[animal.type.toLowerCase()]}</span>
+          )}
+        </p>
         <div className="flex flex-wrap items-center justify-center gap-2 relative py-2">
           <button
             type="button"
             onClick={onSpeakAll}
-            className="nes-btn absolute top-2 right-2"
-            style={{ padding: '0.25rem 0.5rem', minHeight: 'auto' }}
+            className="nes-btn absolute top-2 right-2 min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center"
+            style={{ padding: '0.5rem 0.75rem' }}
             aria-label="Alles voorlezen"
           >
-            <NesIcon name="play" />
+            <NesIcon name="play" size="2x" />
           </button>
           <AnimalImage naam={animal.naam} emoji={animal.emoji} size={88} className="shrink-0" />
           <span className={`nes-badge ${rarityBadgeClass[slug] ?? 'is-success'}`}>

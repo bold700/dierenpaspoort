@@ -57,11 +57,15 @@ export function AnimalImage({ naam, emoji, className = '', size = 80, rounded = 
 
   return (
     <span
-      className={`${sizeClass} inline-flex items-center justify-center leading-none flex-shrink-0 ${className}`}
-      style={{ fontSize: emojiSize }}
+      className={`${sizeClass} flex items-center justify-center flex-shrink-0 ${className}`}
       aria-hidden
     >
-      {emoji}
+      <span
+        className="flex items-center justify-center w-full h-full leading-none text-center"
+        style={{ fontSize: emojiSize, lineHeight: 1 }}
+      >
+        {emoji}
+      </span>
     </span>
   )
 }

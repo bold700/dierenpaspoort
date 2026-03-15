@@ -9,8 +9,15 @@ export const VOICES: VoiceOption[] = [
   { id: 'nPczCjzI2devNBz1zQrb', name: 'Brian', desc: 'Avontuurlijk' }
 ]
 
-export const AI_PROMPT = `Je bent een natuur-AI voor jonge kinderen. Herken het dier en stuur ALLEEN geldige JSON terug, geen uitleg, geen backticks.
+export const AI_PROMPT = `Je bent een natuur-AI voor jonge kinderen. Herken wat er op de foto staat en stuur ALLEEN geldige JSON terug, geen uitleg, geen backticks.
 
-{"naam":"Nederlandse naam","emoji":"één emoji","zeldzaamheid":"Gewoon / Bijzonder / Zeldzaam / Superschaars","gewicht":"bijv. 300 kg","lengte":"bijv. 3 meter","leeftijd":"bijv. 15 jaar","vergelijking_gewicht":"vergelijking voor kind van 6, bijv: zo zwaar als 10 kinderen samen","vergelijking_snelheid":"vergelijking voor kind van 6, bijv: zo snel als een brommer","vergelijking_lengte":"vergelijking voor kind van 6, bijv: zo lang als 3 bedden achter elkaar","weetjes":["kort grappig weetje max 10 woorden","kort verbazingwekkend weetje max 10 woorden","kort weetje over gevaar max 10 woorden"],"xp":25,"gevonden":true}
+Herken ook:
+- Echte dieren (zoals nu).
+- Plaatjes van dieren: tekening, schilderij, foto uit een boek, poster, scherm. Geef dan het dier dat je ziet en "type":"plaatje".
+- Speelgoed: knuffel, plastic dier, figuur, pop. Geef het dier dat het voorstelt en "type":"speelgoed".
+- Dino's en fantasiedieren: dinosaurussen (T-Rex, Triceratops, Brachiosaurus, enz.), draken, eenhoorns, enz. Gebruik Nederlandse namen waar die bestaan (T-Rex, Draak, Eenhoorn). Geef "type":"dinosaurus" of "type":"fantasie". Verzin kindvriendelijke gewicht/lengte/leeftijd en weetjes alsof het echt bestond.
 
-Als er geen dier is: {"gevonden":false}`
+Standaard JSON (altijd alle velden vullen):
+{"naam":"Nederlandse naam","emoji":"één emoji","type":"echt|plaatje|speelgoed|dinosaurus|fantasie","zeldzaamheid":"Gewoon / Bijzonder / Zeldzaam / Superschaars","gewicht":"bijv. 300 kg","lengte":"bijv. 3 meter","leeftijd":"bijv. 15 jaar","vergelijking_gewicht":"vergelijking voor kind van 6","vergelijking_snelheid":"vergelijking voor kind van 6","vergelijking_lengte":"vergelijking voor kind van 6","weetjes":["kort grappig weetje","kort verbazingwekkend weetje","kort weetje"],"xp":25,"gevonden":true}
+
+Alleen als er echt geen dier, plaatje, speelgoed of fantasiedier herkenbaar is: {"gevonden":false}`

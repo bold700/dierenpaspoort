@@ -93,14 +93,21 @@ export function ScanPanel() {
 
   const speakIntro = useCallback(() => {
     if (!result) return
-    speak(`${result.animal.naam}!`)
+    const a = result.animal
+    const t = a.type
+    if (t === 'dinosaurus') speak(`${a.naam}! Een dino!`)
+    else if (t === 'fantasie') speak(`${a.naam}! Een fantasiedier!`)
+    else if (t === 'plaatje') speak(`Een plaatje van een ${a.naam.toLowerCase()}!`)
+    else if (t === 'speelgoed') speak(`Speelgoed: een ${a.naam.toLowerCase()}!`)
+    else speak(`${a.naam}!`)
   }, [result, speak])
 
   const speakAll = useCallback(() => {
     if (!result) return
     const a = result.animal
+    const dierwoord = a.type === 'dinosaurus' ? 'dino' : a.type === 'fantasie' ? 'fantasiedier' : 'dier'
     speak(
-      `${a.naam}! ${a.zeldzaamheid} dier. ${a.vergelijking_gewicht}. ${a.vergelijking_snelheid}. ${a.weetjes?.[0] ?? ''}`
+      `${a.naam}! ${a.zeldzaamheid} ${dierwoord}. ${a.vergelijking_gewicht}. ${a.vergelijking_snelheid}. ${a.weetjes?.[0] ?? ''}`
     )
   }, [result, speak])
 
@@ -138,7 +145,7 @@ export function ScanPanel() {
               <NesIcon name="search" size="4x" />
             </div>
             <p className="nes-text is-primary text-lg font-bold mb-1">Maak een foto van een dier</p>
-            <p className="nes-text is-disabled text-sm mb-4">Hond, vogel, insect — alles telt!</p>
+            <p className="nes-text is-disabled text-sm mb-4">Echt dier, plaatje, speelgoed of dino — alles telt!</p>
             <button
               type="button"
               className="nes-btn is-primary"

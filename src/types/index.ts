@@ -1,8 +1,13 @@
 export type Zeldzaamheid = 'Gewoon' | 'Bijzonder' | 'Zeldzaam' | 'Superschaars'
 
+/** Bron van de scan: echt dier, plaatje, speelgoed of fantasie (dino/draak). */
+export type ScanType = 'echt' | 'plaatje' | 'speelgoed' | 'dinosaurus' | 'fantasie'
+
 export interface AnimalResult {
   naam: string
   emoji: string
+  /** Optioneel: plaatje, speelgoed, dinosaurus of fantasie (draak, eenhoorn, etc.). */
+  type?: ScanType
   zeldzaamheid: Zeldzaamheid
   gewicht: string
   lengte: string
