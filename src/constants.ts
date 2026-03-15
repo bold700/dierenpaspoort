@@ -22,6 +22,8 @@ export const AI_PROMPT = `Je bent een natuur-AI voor jonge kinderen. Herken wat 
 
 Herken ook:
 - Echte dieren (zoals nu).
+- Honden: geef altijd het specifieke ras als je het herkent (bijv. Golden Retriever, Labrador, Beagle, Duitse Herder, Chihuahua, Border Collie, Cocker Spaniël, Jack Russell, Bulldog, Husky, Dalmatiër, Poedel, Teckel, Boxer, Rottweiler, etc.). Als het ras niet duidelijk is, geef je beste schatting of "Hond (ras onbekend)".
+- Katten: geef het ras als herkenbaar (bijv. Europese Korthaar, Siamees, Maine Coon, Perzische kat, Britse Korthaar, Ragdoll, etc.), anders "Kat".
 - Plaatjes van dieren: tekening, schilderij, foto uit een boek, poster, scherm. Geef dan het dier dat je ziet en "type":"plaatje".
 - Speelgoed: knuffel, plastic dier, figuur, pop. Geef het dier dat het voorstelt en "type":"speelgoed".
 - Dino's en fantasiedieren: dinosaurussen (T-Rex, Triceratops, Brachiosaurus, enz.), draken, eenhoorns, enz. Gebruik Nederlandse namen waar die bestaan (T-Rex, Draak, Eenhoorn). Geef "type":"dinosaurus" of "type":"fantasie". Verzin kindvriendelijke gewicht/lengte/leeftijd en weetjes alsof het echt bestond.
