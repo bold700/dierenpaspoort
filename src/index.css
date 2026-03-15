@@ -31,10 +31,25 @@ body::-webkit-scrollbar {
   display: none;
 }
 
+/* Standaard muisaanwijzer in de app (NES.css zet een kleine custom cursor op html/button) */
+.app-shell {
+  cursor: default;
+}
+.app-shell button,
+.app-shell a.nes-btn,
+.app-shell [role="button"] {
+  cursor: pointer;
+}
+.app-shell button:disabled,
+.app-shell .nes-btn.is-disabled {
+  cursor: not-allowed;
+}
+
 /* Safe area voor notches / PWA;zelfde achtergrond als NES is-dark containers */
 .app-shell {
   min-height: 100vh;
   background-color: #212529;
+  padding-top: max(2rem, calc(env(safe-area-inset-top) + 1rem));
   padding-left: max(1rem, env(safe-area-inset-left));
   padding-right: max(1rem, env(safe-area-inset-right));
   padding-bottom: max(2rem, env(safe-area-inset-bottom));

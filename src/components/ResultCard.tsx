@@ -23,16 +23,20 @@ interface ResultCardProps {
   xpGained: number
   isNew: boolean
   onSpeakAll: () => void
+  /** Vanuit collectie: geen auto-speak, toon "Nx gezien" i.p.v. XP/Nieuw */
+  fromCollection?: boolean
+  times?: number
 }
 
-export function ResultCard({ animal, xpGained, isNew, onSpeakAll }: ResultCardProps) {
+export function ResultCard({ animal, xpGained, isNew, onSpeakAll, fromCollection, times }: ResultCardProps) {
   const { speak } = useSpeak()
   const slug = slugify(animal.zeldzaamheid)
 
   useEffect(() => {
+    if (fromCollection) return
     const t = setTimeout(onSpeakAll, 600)
     return () => clearTimeout(t)
-  }, [animal.naam, onSpeakAll])
+  }, [animal.naam, onSpeakAll, fromCollection])
 
   const weightSpeech = `Dit dier weegt ${animal.gewicht}. ${animal.vergelijking_gewicht}`
   const lengthSpeech = `Dit dier is ${animal.lengte} lang. ${animal.vergelijking_lengte}`
@@ -128,11 +132,17 @@ export function ResultCard({ animal, xpGained, isNew, onSpeakAll }: ResultCardPr
       </div>
 
       <div className="nes-container is-rounded is-dark mt-2 py-2 px-3 flex flex-wrap items-center justify-center gap-2">
-        <span className="nes-text is-success">+{xpGained} XP</span>
-        {isNew && (
-          <span className="nes-badge is-primary">
-            <span>Nieuw!</span>
-          </span>
+        {fromCollection && times != null ? (
+          <span className="nes-text is-disabled">{times}x gezien</span>
+        ) : (
+          <>
+            <span className="nes-text is-success">+{xpGained} XP</span>
+            {isNew && (
+              <span className="nes-badge is-primary">
+                <span>Nieuw!</span>
+              </span>
+            )}
+          </>
         )}
       </div>
     </div>

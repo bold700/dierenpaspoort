@@ -66,7 +66,8 @@ export function ScanPanel() {
         animal.zeldzaamheid,
         animal.xp ?? 25,
         isNew,
-        animal.zeldzaamheid === 'Zeldzaam' || animal.zeldzaamheid === 'Superschaars'
+        animal.zeldzaamheid === 'Zeldzaam' || animal.zeldzaamheid === 'Superschaars',
+        animal
       )
       const levelAfter = useAppStore.getState().level
       if (levelAfter > levelBefore) {

@@ -212,6 +212,18 @@ export function SettingsPanel() {
       <div className="nes-container is-rounded is-dark">
         <p className="nes-text is-primary text-xs font-bold mb-2">Info</p>
         <p className="nes-text is-disabled text-sm">Sleutels worden alleen lokaal opgeslagen. Nooit gedeeld.</p>
+        <hr className="my-3 border-[#4a4f57]" />
+        <p className="nes-text is-disabled text-xs">
+          Mogelijk gemaakt door{' '}
+          <a
+            href="https://www.bold700.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="nes-text is-primary hover:underline"
+          >
+            BOLD700
+          </a>
+        </p>
       </div>
 
       <div className="nes-container is-rounded is-dark">

@@ -30,6 +30,8 @@ export interface CollectionItem {
   emoji: string
   rarity: string
   times: number
+  /** Volledige scaninfo om in collectie weer te geven (vanaf eerste/laatste scan). */
+  detail?: AnimalResult
 }
 
 export interface Achievement {

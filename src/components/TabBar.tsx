@@ -3,20 +3,21 @@ import { cn } from '@/lib/utils'
 
 const tabs = [
   { to: '/', label: 'Scannen' },
+  { to: '/leer', label: 'Leer' },
   { to: '/collectie', label: 'Collectie' },
   { to: '/badges', label: 'Badges' },
 ] as const
 
 export function TabBar() {
   return (
-    <nav className="tab-bar flex gap-1 sm:gap-2 min-w-0">
+    <nav className="tab-bar grid grid-cols-2 gap-2 sm:gap-3 min-w-0">
       {tabs.map(({ to, label }) => (
         <NavLink
           key={to}
           to={to}
           className={({ isActive }) =>
             cn(
-              'nes-btn flex-1 min-w-0 text-center text-[10px] sm:text-xs md:text-sm px-1 sm:px-2',
+              'nes-btn w-full min-w-0 text-center text-xs sm:text-sm px-2 sm:px-3 py-2.5',
               isActive && 'is-primary'
             )
           }

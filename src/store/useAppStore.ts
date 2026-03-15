@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { AppState, Achievement } from '../types'
+import type { AppState, Achievement, AnimalResult } from '../types'
 
 const ACHIEVEMENTS: Achievement[] = [
   { id: 'first', icon: 'heart', name: 'Eerste stap', desc: 'Scan je eerste dier', req: (s) => s.totalSeen >= 1 },
@@ -41,7 +41,7 @@ function persist(state: AppState) {
 
 export const useAppStore = create<AppState & {
   achievements: Achievement[]
-  addSeenAnimal: (name: string, emoji: string, rarity: string, xp: number, _isNew: boolean, isRare?: boolean) => number
+  addSeenAnimal: (name: string, emoji: string, rarity: string, xp: number, _isNew: boolean, isRare?: boolean, detail?: AnimalResult) => number
   addXP: (amount: number) => void
   checkAchievements: () => string[]
   resetAll: () => void
@@ -50,15 +50,16 @@ export const useAppStore = create<AppState & {
   ...loadState(),
   achievements: ACHIEVEMENTS,
 
-  addSeenAnimal(name, emoji, rarity, xp, _isNew, isRare = false) {
+  addSeenAnimal(name, emoji, rarity, xp, _isNew, isRare = false, detail) {
     const state = get()
     const existing = state.collection.find((c) => c.name === name)
     let xpGained: number
     if (existing) {
       existing.times++
+      if (detail) existing.detail = detail
       xpGained = Math.round(xp * 0.4)
     } else {
-      state.collection.push({ name, emoji, rarity, times: 1 })
+      state.collection.push({ name, emoji, rarity, times: 1, detail })
       xpGained = xp
     }
     const newState: AppState = {
