@@ -13,7 +13,7 @@ export interface LeerDier extends LeerDierBase {
   naam: string
   kort?: string
   beschrijving: string
-  weetjes: [string, string, string, string, string]
+  weetjes: string[]
 }
 
 /** Lijst dieren (id, emoji, categorie). Tekst komt uit LEER_CONTENT[locale]. */

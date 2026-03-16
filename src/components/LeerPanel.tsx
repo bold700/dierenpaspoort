@@ -1,3 +1,4 @@
+import { useRef, useCallback } from 'react'
 import { useSpeak } from '../hooks/useSpeak'
 import { useTranslations } from '../i18n/useTranslations'
 import { getLeerDierenWithLocale } from '../data/leerDieren'
@@ -16,19 +17,19 @@ const CATEGORIE_KEY: Record<LeerDier['categorie'], string> = {
   overig: 'catOverig',
 }
 
-function pickRandom<T>(arr: [T, T, T, T, T]): T {
-  return arr[Math.floor(Math.random() * 5)]
-}
-
-function DierKaart({ dier }: { dier: LeerDier }) {
+function DierKaart({ dier, onGetWeetje }: { dier: LeerDier; onGetWeetje: (id: string) => string }) {
   const { speak } = useSpeak()
   const { t } = useTranslations()
-  const teZeggen = `${t('learnThisIs')} ${dier.naam}. ${pickRandom(dier.weetjes)}`
+
+  const handleClick = useCallback(() => {
+    const weetje = onGetWeetje(dier.id)
+    speak(`${t('learnThisIs')} ${dier.naam}. ${weetje}`)
+  }, [dier, onGetWeetje, speak, t])
 
   return (
     <button
       type="button"
-      onClick={() => speak(teZeggen)}
+      onClick={handleClick}
       className="nes-container is-rounded is-dark w-full min-w-0 py-3 px-2 text-center cursor-pointer min-h-[5rem] flex flex-col items-center justify-center gap-1 transition-[transform,filter] duration-150 ease-out hover:brightness-110 hover:scale-[1.02] active:brightness-90 active:scale-[0.96] active:bg-black/20"
       aria-label={`Luister naar ${dier.naam}`}
     >
@@ -43,6 +44,18 @@ function DierKaart({ dier }: { dier: LeerDier }) {
 export function LeerPanel() {
   const { t, locale } = useTranslations()
   const dieren = getLeerDierenWithLocale(locale)
+
+  const indexMap = useRef<Record<string, number>>({})
+
+  const getNextWeetje = useCallback((id: string): string => {
+    const dier = dieren.find((d) => d.id === id)
+    if (!dier || dier.weetjes.length === 0) return ''
+    const current = indexMap.current[id] ?? 0
+    const weetje = dier.weetjes[current % dier.weetjes.length]
+    indexMap.current[id] = current + 1
+    return weetje
+  }, [dieren])
+
   const perCategorie = dieren.reduce<Record<LeerDier['categorie'], LeerDier[]>>(
     (acc, d) => {
       if (!acc[d.categorie]) acc[d.categorie] = []
@@ -72,7 +85,7 @@ export function LeerPanel() {
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {dieren.map((d) => (
-                <DierKaart key={d.id} dier={d} />
+                <DierKaart key={d.id} dier={d} onGetWeetje={getNextWeetje} />
               ))}
             </div>
           </section>
