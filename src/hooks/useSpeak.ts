@@ -1,7 +1,16 @@
 import { useCallback, useRef } from 'react'
 import { useSettingsStore } from '../store/useSettingsStore'
+import type { Locale } from '../i18n/translations'
 
 const ELEVENLABS_URL = 'https://api.elevenlabs.io/v1/text-to-speech/'
+
+const BROWSER_TTS_LANG: Record<Locale, string> = {
+  nl: 'nl-NL',
+  en: 'en-US',
+  es: 'es-ES',
+  zh: 'zh-CN',
+  fr: 'fr-FR',
+}
 
 /** Gedeelde ref zodat elke speak()-aanroep (van welke component dan ook) de vorige audio stopt. */
 const globalAudioRef = { current: null as HTMLAudioElement | null }
@@ -22,8 +31,9 @@ export function useSpeak() {
     (text: string) => {
       if (!text) return
       stopAllSpeech()
+      const { locale } = useSettingsStore.getState()
       const u = new SpeechSynthesisUtterance(text)
-      u.lang = 'nl-NL'
+      u.lang = BROWSER_TTS_LANG[locale] ?? BROWSER_TTS_LANG.nl
       u.rate = 0.9
       u.pitch = 1.1
       window.speechSynthesis.speak(u)
