@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { useSpeak } from '../hooks/useSpeak'
 import { useTranslations } from '../i18n/useTranslations'
 import { getLeerDierenWithLocale } from '../data/leerDieren'
@@ -16,19 +17,23 @@ const CATEGORIE_KEY: Record<LeerDier['categorie'], string> = {
   overig: 'catOverig',
 }
 
-function pickRandom<T>(arr: [T, T, T, T, T]): T {
-  return arr[Math.floor(Math.random() * 5)]
-}
-
 function DierKaart({ dier }: { dier: LeerDier }) {
   const { speak } = useSpeak()
   const { t } = useTranslations()
-  const teZeggen = `${t('learnThisIs')} ${dier.naam}. ${pickRandom(dier.weetjes)}`
+  const factIndexRef = useRef(0)
+
+  const spreekVolgendWeetje = () => {
+    if (!dier.weetjes.length) return
+    const index = factIndexRef.current % dier.weetjes.length
+    const teZeggen = `${t('learnThisIs')} ${dier.naam}. ${dier.weetjes[index]}`
+    factIndexRef.current = index + 1
+    void speak(teZeggen)
+  }
 
   return (
     <button
       type="button"
-      onClick={() => speak(teZeggen)}
+      onClick={spreekVolgendWeetje}
       className="nes-container is-rounded is-dark w-full min-w-0 py-3 px-2 text-center cursor-pointer min-h-[5rem] flex flex-col items-center justify-center gap-1 transition-[transform,filter] duration-150 ease-out hover:brightness-110 hover:scale-[1.02] active:brightness-90 active:scale-[0.96] active:bg-black/20"
       aria-label={`Luister naar ${dier.naam}`}
     >
