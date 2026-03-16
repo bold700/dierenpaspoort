@@ -9,7 +9,7 @@ export type LeerContentItem = {
   naam: string
   kort?: string
   beschrijving: string
-  weetjes: [string, string, string, string, string]
+  weetjes: string[]
 }
 
 export type LeerContentLocale = Record<string, LeerContentItem>
